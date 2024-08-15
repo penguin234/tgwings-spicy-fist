@@ -1,2 +1,2 @@
 # tgwings-spicy-fist
-Kihyun Lim has spiciest fist
+Kihyun Lim has the spiciest fists.
