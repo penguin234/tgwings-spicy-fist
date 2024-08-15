@@ -74,7 +74,7 @@ const checkAndResetSeats = () => {
 };
 
 // Run the check every minute
-setInterval(checkAndResetSeats, 60000); // 60000 ms = 1 minute
+//setInterval(checkAndResetSeats, 60000); // 60000 ms = 1 minute
 
 
 

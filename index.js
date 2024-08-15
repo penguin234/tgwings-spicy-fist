@@ -4,9 +4,9 @@ const app = express()
 const cors = require('cors');                           //서버간 통신 모듈
 app.use(cors())
 
+
 const bodyParser = require('body-parser')
 app.use(bodyParser.json())
-app.use(bodyParser.urlencoded())
 app.use(bodyParser.urlencoded({extended: true}))        //extended: true -> qs라이브러리로 중첩 허용, 중첩을 허용해야하나? 아니지 않나
 
 const path = require('node:path')   
@@ -15,7 +15,10 @@ const uuid4 = require('uuid4')                          //데이터베이스 키
 //multer모듈 사용할 필요 있는가
 
 
-const PORT = 80
+const PORT = 8080
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
 
 const database = require('./database/index')            //데이터베이스 파일 경로
 
