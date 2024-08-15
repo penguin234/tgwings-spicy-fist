@@ -30,11 +30,13 @@ app.post('/user/login', (req, res) => {
     const pw = req.body.pw                //로그인시 비밀번호
 
     database.login(id, pw, (data, cookie) => {
+        database.setSession(id, cookie)
         res.json({
             ok: true,
             data: data,
             cookie: cookie
         })
+
     },
     (err) => {
         res.status(400).json({
@@ -42,6 +44,7 @@ app.post('/user/login', (req, res) => {
             err: err
         })
     })
+    
 })
 
 app.post('/user/qr', (req,res) => {                     //qr코드 발급
@@ -85,7 +88,7 @@ app.put('/user/reserve', (req,res) => {                 //자리 예약, 예약x
     else {
         const roomNumber = req.body.roomNumber //roomnumber 추가
         const seatNumber = req.body.seatNumber
-        if(getSeatBySeatNumber(roomNumber,seatNumber).reservedTime != null) {   //다른 사람이 예약중인 좌석
+        if(getSeatBySeatNumber(seatNumber).reservedTime != null) {   //다른 사람이 예약중인 좌석
             res.json({
                 ok: false,
                 err: 'already reserved seat'
