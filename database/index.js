@@ -96,7 +96,7 @@ function getpublickey(callback) {
 
 const JSEncrypt = require('node-jsencrypt');
 
-function login(id, pw, callback) {
+function login(id, pw, callback, ecallback) {
     getpublickey((key, cookie) => {
         let enc = new JSEncrypt()
         enc.setPublicKey(key)
@@ -119,6 +119,7 @@ function login(id, pw, callback) {
         }, function(err, res, body) {
             if (err) {
                 console.log('err', err)
+                ecallback(err)
                 return
             }
             
@@ -126,6 +127,7 @@ function login(id, pw, callback) {
             data = data.split('<p class="userName">')
             if (data.length == 1) {
                 console.log('login failed')
+                ecallback('login failed')
                 return
             }   
             data = data[2]
@@ -198,5 +200,5 @@ function getQR(id, pw, callback) {
     })
 }
 module.exports = {
-    rooms, seats, reserveSeat, deleteSeat, getSeatBySeatNumber, getSeatById, addTime, getQR
+    rooms, seats, reserveSeat, deleteSeat, getSeatBySeatNumber, getSeatById, addTime, getQR, login,getMID
 };

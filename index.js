@@ -26,8 +26,22 @@ const database = require('./database/index')            //데이터베이스 파
 //회원가입 필요 없음
 
 app.post('/user/login', (req, res) => {
-    const name = req.body.name                          //로그인시 이름
-    const studentId = req.body.studentId                //로그인시 학번
+    const id = req.body.id                         //로그인시 아이디
+    const pw = req.body.pw                //로그인시 비밀번호
+
+    database.login(id, pw, (data, cookie) => {
+        res.json({
+            ok: true,
+            data: data,
+            cookie: cookie
+        })
+    },
+    (err) => {
+        res.status(400).json({
+            ok: false,
+            err: err
+        })
+    })
 })
 
 app.post('/user/qr', (req,res) => {                     //qr코드 발급
