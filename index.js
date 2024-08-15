@@ -88,7 +88,7 @@ app.put('/user/reserve', (req,res) => {                 //자리 예약, 예약x
     else {
         const roomNumber = req.body.roomNumber //roomnumber 추가
         const seatNumber = req.body.seatNumber
-        if(getSeatBySeatNumber(roomNumber,seatNumber).reservedTime != null) {   //다른 사람이 예약중인 좌석
+        if(getSeatBySeatNumber(seatNumber).reservedTime != null) {   //다른 사람이 예약중인 좌석
             res.json({
                 ok: false,
                 err: 'already reserved seat'

@@ -1,19 +1,8 @@
 //databse seat: made by 김성민 v.2024-08-15 
-
-const rooms = [
-    { roomNumber: 0, totalSeats: 20 }, //0: 자대열람실
-    { roomNumber: 1, totalSeats: 410 }, //1: 1열람실
-    { roomNumber: 2, totalSeats: 326 }, //2: 2열람실
-    { roomNumber: 3, totalSeats: 156 }, //3: 벗터
-    { roomNumber: 4, totalSeats: 187 } //4: 혜윰
-];
-
 let seats = [];
-
-rooms.forEach(room => {
-    for (let i = 1; i <= room.totalSeats; i++) {
+const totalSeats=20;//자대 열람실 자리 수
+    for (let i = 1; i <= totalSeats; i++) {
         seats.push({
-            roomNumber: room.roomNumber,
             seatNumber: i,
             id: null,
             reservedTime: null,
@@ -21,7 +10,6 @@ rooms.forEach(room => {
             addCount: 3
         });
     }
-});
 const session=[];
 const setSession = function(id,cookie) { 
     //중복 로그인 방지
@@ -34,8 +22,8 @@ const setSession = function(id,cookie) {
 }
 
 
-const reserveSeat = function(roomNumber, seatNumber, id, reservedTime, time) {
-    let seat = seats.find(seat => seat.roomNumber === roomNumber && seat.seatNumber === seatNumber);
+const reserveSeat = function(seatNumber, id, reservedTime, time) {
+    let seat = seats.find(seat => seat.seatNumber === seatNumber);
     if (seat) {
         seat.id = id;
         seat.reservedTime = reservedTime;
@@ -56,8 +44,8 @@ const deleteSeat = function(seat) {
     }
 };
 
-const getSeatBySeatNumber = function(roomnumber,seatNumber) {
-    return seats.filter((seat) => seat.roomNumber == roomnumber && seat.seatNumber == seatNumber)
+const getSeatBySeatNumber = function(seatNumber) {
+    return seats.filter((seat) => seat.seatNumber == seatNumber)
 };
 const getSeatById = function(id) {
     return seats.filter((seat) => seat.id == id)
@@ -76,7 +64,7 @@ const checkAndResetSeats = () => {
             const now = DateTime.now();
 
             if (now >= reservationEnd) {
-                console.log(`Resetting seat ${seat.seatNumber} in room ${seat.roomNumber} as its reservation has expired.`);
+                console.log(`Resetting seat ${seat.seatNumber} as its reservation has expired.`);
                 deleteSeat(seat);
             }
         }
