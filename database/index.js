@@ -22,6 +22,16 @@ rooms.forEach(room => {
         });
     }
 });
+const session=[];
+const setSession = function(id,cookie) { 
+    //중복 로그인 방지
+    const sessionAvaliable = session.find(user => user.id === id);
+    if (!sessionAvaliable) {
+    session.push({
+        id: id,
+        Cookie: cookie
+    });}
+}
 
 
 const reserveSeat = function(roomNumber, seatNumber, id, reservedTime, time) {
@@ -200,5 +210,5 @@ function getQR(id, pw, callback) {
     })
 }
 module.exports = {
-    rooms, seats, reserveSeat, deleteSeat, getSeatBySeatNumber, getSeatById, addTime, getQR, login,getMID
+    rooms, seats, reserveSeat, deleteSeat, getSeatBySeatNumber, getSeatById, addTime, getQR, login,getMID, setSession
 };
