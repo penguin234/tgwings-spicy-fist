@@ -200,5 +200,5 @@ function getQR(id, pw, callback) {
     })
 }
 module.exports = {
-    rooms, seats, reserveSeat, deleteSeat, getSeatBySeatNumber, getSeatById, addTime, getQR, login,getMID
+    seats, reserveSeat, deleteSeat, getSeatBySeatNumber, getSeatById, addTime, getQR, login,getMID
 };
