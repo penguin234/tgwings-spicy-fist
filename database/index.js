@@ -12,13 +12,16 @@ const totalSeats=20;//자대 열람실 자리 수
     }
 const session=[];
 const setSession = function(id,cookie) { 
-    //중복 로그인 방지
+    //중복 로그인시 최근 로그인 정보를 덮어씀
     const sessionAvaliable = session.find(user => user.id === id);
     if (!sessionAvaliable) {
     session.push({
         id: id,
         Cookie: cookie
     });}
+    else {
+        sessionAvaliable.Cookie = cookie;
+    }
 }
 
 
