@@ -24,6 +24,10 @@ const setSession = function(id,cookie) {
     }
 }
 
+const getSession = function(id) {
+    return session.find(user => user.id == id)
+}
+
 
 const reserveSeat = function(seatNumber, id, reservedTime, time) {
     let seat = seats.find(seat => seat.seatNumber === seatNumber);
@@ -143,7 +147,7 @@ function login(id, pw, callback, ecallback) {
     })
 }
 
-function getMID(cookie, callback) {
+function getMID(cookie, callback, ecallback) {
     request.get({
         url: 'https://lib.khu.ac.kr/relation/mobileCard',
         followAllRedirects: false,
@@ -154,6 +158,7 @@ function getMID(cookie, callback) {
     }, function(err, res, body) {
         if (err) {
             console.log('err', err)
+            ecallback(err)
             return
         }
 
@@ -161,48 +166,48 @@ function getMID(cookie, callback) {
         mid = mid.split('<input type="hidden" name="mid_user_id" value="')
         if (mid.length == 1) {
             console.log('err: cannot get MID')
+            ecallback(err)
             return
         }
         mid = mid[1]
         mid = mid.split('"')[0]
-        console.log('mid', mid)
         callback(mid)
     })
 }
 
-function getQR(id, pw, callback) {
-    login(id, pw, (data, cookie) => {
-        getMID(cookie, (mid) => {
-            request.post({
-                url: 'https://lib.khu.ac.kr:8443/mconnect/makeCode',
-                followAllRedirects: false,
-                'Content-type': 'application/x-www-form-urlencoded',
-                form: {
-                    mid_user_id: mid
-                },
-                headers: {
-                    'User-Agent': 'request',
-                    Cookie: cookie
-                }
-            }, function(err, res, body) {
-                if (err) {
-                    console.log('err', err)
-                    return
-                }
+function getQR(mid, cookie, callback, ecallback) {
+    request.post({
+        url: 'https://lib.khu.ac.kr:8443/mconnect/makeCode',
+        followAllRedirects: false,
+        'Content-type': 'application/x-www-form-urlencoded',
+        form: {
+            mid_user_id: mid
+        },
+        headers: {
+            'User-Agent': 'request',
+            Cookie: cookie
+        }
+    }, function(err, res, body) {
+        if (err) {
+            console.log('err', err)
+            ecallback(err)
+            return
+        }
 
-                let QR = body
-                QR = QR.split('text: "')
-                if (QR.length == 1) {
-                    console.log('err: cannot get QR')
-                }
-                QR = QR[1]
-                QR = QR.split('"')[0]
+        let QR = body
+        QR = QR.split('text: "')
+        if (QR.length == 1) {
+            console.log('err: cannot get QR')
+            ecallback('cannot get QR')
+            return
+        }
+        QR = QR[1]
+        QR = QR.split('"')[0]
 
-                callback(data, cookie, QR)
-            })
-        })
+        callback(QR)
     })
 }
+
 module.exports = {
-    seats, reserveSeat, deleteSeat, getSeatBySeatNumber, getSeatById, addTime, getQR, login,getMID, setSession
+    seats, reserveSeat, deleteSeat, getSeatBySeatNumber, getSeatById, addTime, getQR, login,getMID, setSession, getSession
 };

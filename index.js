@@ -49,7 +49,44 @@ app.post('/user/login', (req, res) => {
 })
 
 app.post('/user/qr', (req,res) => {                     //qr코드 발급
-    const qr = req.body.qr
+    const id = req.body.id
+    if (!id) {
+        res.json({
+            ok: false,
+            err: 'id is required'
+        })
+        return
+    }
+
+    const session = database.getSession(id)
+    if (!session) {
+        res.json({
+            ok: false,
+            err: 'login first'
+        })
+        return
+    }
+
+    database.getMID(session.Cookie, (mid) => {
+        database.getQR(mid, session.Cookie, (QR) => {
+            res.json({
+                ok: true,
+                QR: QR
+            })
+        },
+        (err) => {
+            res.json({
+                ok: false,
+                err: err
+            })
+        })
+    },
+    (err) => {
+        res.json({
+            ok: false,
+            err: err
+        })
+    })
 })
 
 app.get('/user/qr/check', (req, res) => {               //qr 확인      
