@@ -30,10 +30,11 @@ app.post('/user/login', (req, res) => {
     const pw = req.body.pw                //로그인시 비밀번호
 
     database.login(id, pw, (data, cookie) => {
-        database.setSession(id, cookie)
+        database.setSession(data.id, cookie)
         res.json({
             ok: true,
-            data: data,
+            name: data.name,
+            id: data.id,
             cookie: cookie
         })
 

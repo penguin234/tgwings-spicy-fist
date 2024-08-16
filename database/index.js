@@ -134,8 +134,11 @@ function login(id, pw, callback, ecallback) {
             data = data[2]
             data = data.split('<span class="name">')[1]
             data = data.split('</span>')[0]
+
+            data = data.split(')')[0]
+            let [name, id] = data.split('(')
             
-            callback(data, cookie)
+            callback({name: name, id: id}, cookie)
         })
     })
 }
@@ -201,5 +204,5 @@ function getQR(id, pw, callback) {
     })
 }
 module.exports = {
-    seats, reserveSeat, deleteSeat, getSeatBySeatNumber, getSeatById, addTime, getQR, login,getMID
+    seats, reserveSeat, deleteSeat, getSeatBySeatNumber, getSeatById, addTime, getQR, login,getMID, setSession
 };
