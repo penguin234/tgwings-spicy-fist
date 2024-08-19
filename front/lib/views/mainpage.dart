@@ -1,35 +1,48 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'dart:math';
-import 'data.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import '../theme.dart';
-import './utils.dart';
+import 'package:tgthon/views/QRpage.dart';
+import 'package:tgthon/views/crowdExpectPage.dart';
+import 'package:tgthon/views/myPage.dart';
+import 'package:tgthon/views/seatReservePage.dart';
+import '../theme.dart'; // khred 색상 사용을 위한 import
 
-
-class MainPage extends StatefulWidget{
+class MainPage extends StatefulWidget {
   final Map<String, dynamic> data;
   const MainPage(this.data, {super.key});
 
   @override
-  _MainPageState createState(){
+  _MainPageState createState() {
     return _MainPageState();
   }
 }
 
 class _MainPageState extends State<MainPage> {
-
   @override
-  void dispose(){
+  void dispose() {
     super.dispose();
   }
 
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
+    final buttonTextStyle = GoogleFonts.notoSans(
+      fontSize: 20,
+      color: Colors.white70,
+    );
+
+    final double buttonSize = MediaQuery.of(context).size.width * 0.5; // 버튼 크기 계산
+
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back,
+            color: Colors.black,
+            size: 30.0,
+          ),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
         backgroundColor: Colors.white,
         title: Text(
           'BookSeat',
@@ -49,18 +62,21 @@ class _MainPageState extends State<MainPage> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      'team SpicyFist',
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: Colors.black,
+                      widget.data['name'],
+                      style: GoogleFonts.notoSans(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                      ),
+                    ),
+                    SizedBox(height: 5),
+                    Text(
+                      widget.data['id'],
+                      style: GoogleFonts.notoSans(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
                       ),
                     ),
                   ],
-                ),
-                SizedBox(width: 8),
-                Image(
-                  image: AssetImage('assets/team_logo.png'),
-                  height: 40,
                 ),
               ],
             ),
@@ -79,115 +95,124 @@ class _MainPageState extends State<MainPage> {
               ),
             ),
           ),
-          Positioned(
-              top: 230,
-              child: Image(
-                image: AssetImage('assets/KHU.png'),
-                width: 230,
-              )
-          ),
           Center(
             child: Container(
-              padding: EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8.0),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 10.0,
-                    offset: Offset(0, 2),
-                  ),
-                ],
-              ),
-              width: 300,
+              width: buttonSize * 2, // 전체 너비 계산
               child: Column(
-                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  TextField(
-                    decoration: InputDecoration(
-                        labelText: widget.data['name'],
-                        border: OutlineInputBorder(),
-                        focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: khblue,
-                              width: 2.0,
-                            )
-                        )
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      buildMenuButton(
+                        context,
+                        Icons.qr_code,
+                        '이용증',
+                        buttonTextStyle,
+                        buttonSize * 0.6,
+                            () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => QRpage(widget.data),
+                            ),
+                          );
+                        },
+                      ),
+                      SizedBox(width: 40),
+                      buildMenuButton(
+                        context,
+                        Icons.event_seat,
+                        '좌석 예약',
+                        buttonTextStyle,
+                        buttonSize * 0.6,
+                            () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => SeatReservePage(widget.data),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
                   ),
-                  SizedBox(height: 16),
-                  TextField(
-                    decoration: InputDecoration(
-                        labelText: widget.data['id'],
-                        border: OutlineInputBorder(),
-                        focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: khblue,
-                              width: 2.0,
-                            )
-                        )
-                    ),
-                    obscureText: true,
-                  ),
-                  SizedBox(height: 16),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: khblue,
-                        surfaceTintColor: khblue,
-                        foregroundColor: Colors.white
-                    ),
-                    onPressed: () async{
-                      try {
-
-                      }
-                      catch (e) {
-                        showSnackbar(context, '로그인 실패');
-                      }
-                    },
-                    child: Text('Sign in'),
+                  SizedBox(height: 20), // 1행과 2행 사이의 여백
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      buildMenuButton(
+                        context,
+                        Icons.manage_search,
+                        '예상 혼잡도',
+                        buttonTextStyle,
+                        buttonSize * 0.6,
+                            () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => CrowdExpectPage(widget.data),
+                            ),
+                          );
+                        },
+                      ),
+                      SizedBox(width: 40),
+                      buildMenuButton(
+                        context,
+                        Icons.person,
+                        '내 정보',
+                        buttonTextStyle,
+                        buttonSize * 0.6,
+                            () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => MyPage(widget.data),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ),
-          ),
-          Positioned(
-            bottom: 16.0,
-            left: 5.0,
-            right: 5.0,
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final maxWidth = constraints.maxWidth;
-                final quote = goldenQuotes[Random().nextInt(goldenQuotes.length)];
-                return AutoSizeText(
-                  quote,
-                  style: TextStyle(
-                    color: Colors.white60,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  maxFontSize: 14,
-                  minFontSize: 11,
-                  stepGranularity: 1,
-                  maxLines: 1,
-                  textAlign: TextAlign.center,
-                  overflowReplacement: AutoSizeText(
-                    quote,
-                    style: TextStyle(
-                      color: Colors.white60,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    maxFontSize: 14,
-                    minFontSize: 11,
-                    stepGranularity: 1,
-                    maxLines: 2,
-                    textAlign: TextAlign.center,
-                  ),
-                );
-              },
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget buildMenuButton(BuildContext context, IconData icon, String title, TextStyle textStyle, double size, VoidCallback onPressed) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          height: size, // 버튼의 높이 설정
+          width: size, // 버튼의 너비 설정
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12.0),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 10.0,
+                offset: Offset(0, 2),
+              ),
+            ],
+          ),
+          child: IconButton(
+            icon: Icon(
+              icon,
+              size: size * 0.5, // 아이콘 크기 설정
+              color: khblue,
+            ),
+            onPressed: onPressed, // 버튼 클릭 시 동작
+          ),
+        ),
+        SizedBox(height: 8),
+        Text(
+          title,
+          style: textStyle,
+        ),
+      ],
     );
   }
 }

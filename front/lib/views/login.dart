@@ -96,7 +96,7 @@ class _MyLoginPageState extends State<MyLoginPage> {
             ),
           ),
           Positioned(
-              top: 230,
+              top: 200,
               child: Image(
                 image: AssetImage('assets/KHU.png'),
                 width: 230,
@@ -159,7 +159,7 @@ class _MyLoginPageState extends State<MyLoginPage> {
                       try {
                         final res = await login(_idController.text, _pwController.text); //login 함수 호출, 백엔드에 입력받은 id와 pw 전송
                         final studentData = jsonDecode(res.body) as Map<String, dynamic>;
-                        Navigator.of(context).pushReplacement(
+                        Navigator.of(context).push(
                             MaterialPageRoute(
                                 builder: (context) => MainPage(studentData)));
                       }
