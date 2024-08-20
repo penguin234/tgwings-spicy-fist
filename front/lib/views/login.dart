@@ -179,7 +179,6 @@ class _MyLoginPageState extends State<MyLoginPage> {
             right: 5.0,
             child: LayoutBuilder(
               builder: (context, constraints) {
-                final maxWidth = constraints.maxWidth;
                 final quote = goldenQuotes[Random().nextInt(goldenQuotes.length)];
                 return AutoSizeText(
                   quote,
