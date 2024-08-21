@@ -91,7 +91,7 @@ app.post('/user/qr', (req,res) => {                     //qr코드 발급
 
 app.get('/user/qr/check', (req, res) => {               //qr 확인      
     const id = req.query.id
-    const data = database.getQrById(id)
+    const data = database.getQR(id)
     if (data.length == 0) {                         //qr이 발급되지 않은 상태
         res.status(404)
     }
@@ -124,9 +124,8 @@ app.put('/user/reserve', (req,res) => {                 //자리 예약, 예약x
         res.status(400)
     }
     else {
-        const roomNumber = req.body.roomNumber //roomnumber 추가
         const seatNumber = req.body.seatNumber
-        if(getSeatBySeatNumber(seatNumber).reservedTime != null) {   //다른 사람이 예약중인 좌석
+        if(database.getSeatBySeatNumber(seatNumber).reservedTime != null) {   //다른 사람이 예약중인 좌석
             res.json({
                 ok: false,
                 err: 'already reserved seat'
@@ -161,7 +160,7 @@ app.put('/user/reserve/off', (req, res) => {                //자리 예약, 예
     res.json({
         ok: true,
         message: 'Reservation cancelled',
-        data: seat
+        data: data //취소된 좌석 정보
     })
 })
 
