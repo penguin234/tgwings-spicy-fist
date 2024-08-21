@@ -4,7 +4,7 @@ import 'package:tgthon/views/QRpage.dart';
 import 'package:tgthon/views/crowdExpectPage.dart';
 import 'package:tgthon/views/myPage.dart';
 import 'package:tgthon/views/seatReservePage.dart';
-import '../theme.dart'; // khred 색상 사용을 위한 import
+import '../theme.dart';
 
 class MainPage extends StatefulWidget {
   final Map<String, dynamic> data;
@@ -35,7 +35,7 @@ class _MainPageState extends State<MainPage> {
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(
-            Icons.arrow_back,
+            Icons.logout,
             color: Colors.black,
             size: 30.0,
           ),
