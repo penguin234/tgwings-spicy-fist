@@ -41,11 +41,13 @@ const reserveSeat = function(seatNumber, id, reservedTime, time) {
 };
 
 const deleteSeat = function(seat) {
-    if (seat.id!=null) {
+    console.log('Before deletion:', JSON.stringify(seat, null, 2));
+    if (seat&&seat.id!==null) {
         seat.id = null;
         seat.reservedTime = null;
         seat.time = null;
         seat.addCount=3;
+        console.log('After deletion:', JSON.stringify(seat, null, 2));
     } else {
         console.log('Unavailable delete');
     }
@@ -55,7 +57,7 @@ const getSeatBySeatNumber = function(seatNumber) {
     return seats.filter((seat) => seat.seatNumber == seatNumber)
 };
 const getSeatById = function(id) {
-    return seats.filter((seat) => seat.id == id)
+    return seats.filter((seat) => seat.id == id && seat.id!==null);
 };
 
 const addTime = function(seat,time,newAddCount) {

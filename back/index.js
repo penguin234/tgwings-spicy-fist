@@ -104,7 +104,7 @@ app.get('/user/qr/check', (req, res) => {               //qr 확인
 app.get('/user/seat', (req, res) => {                   //예약한 자리 정보 확인
     const id = req.query.id
     const data = database.getSeatById(id)
-    if(data.length == 0) {                          //예약한 자리가 없는 상태
+    if(data.length === 0) {                          //예약한 자리가 없는 상태
         res.status(404).json({
             ok: false,
             err: 'No reserved seat'
@@ -140,7 +140,7 @@ app.put('/user/reserve', (req,res) => {                 //자리 예약, 예약x
             ok: true
         })
     }
-})
+})// 같은 사람이 다시 예약하려할 때
 
 app.put('/user/reserve/off', (req, res) => {                //자리 예약, 예약 o -> 예약 x
     const id = req.query.id
