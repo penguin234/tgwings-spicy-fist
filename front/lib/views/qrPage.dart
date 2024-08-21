@@ -46,17 +46,6 @@ class _QRpageState extends State<QRpage> {
   Widget build(BuildContext context) {
     _deadline = DateTime.now().millisecondsSinceEpoch + 10 * 60 * 1000;
 
-    final buttonTextStyle = GoogleFonts.notoSans(
-      //fontWeight: FontWeight.bold,
-        fontSize: 20,
-        color: Colors.white70
-    );
-
-    final double buttonSize = MediaQuery
-        .of(context)
-        .size
-        .width * 0.4; // 버튼 크기 계산
-
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(

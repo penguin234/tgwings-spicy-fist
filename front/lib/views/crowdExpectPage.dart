@@ -20,16 +20,6 @@ class _CrowdExpectPageState extends State<CrowdExpectPage> {
 
   @override
   Widget build(BuildContext context) {
-    final buttonTextStyle = GoogleFonts.notoSans(
-      //fontWeight: FontWeight.bold,
-        fontSize: 20,
-        color: Colors.white70
-    );
-
-    final double buttonSize = MediaQuery
-        .of(context)
-        .size
-        .width * 0.4; // 버튼 크기 계산
 
     return Scaffold(
       appBar: AppBar(

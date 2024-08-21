@@ -24,12 +24,6 @@ class _ReadingRoomState extends State<ReadingRoom> {
 
   @override
   Widget build(BuildContext context) {
-    final buttonTextStyle = GoogleFonts.notoSans(
-      fontSize: 20,
-      color: Colors.white70,
-    );
-
-    final double buttonSize = MediaQuery.of(context).size.width * 0.5; // 버튼 크기 계산
 
     return Scaffold(
       appBar: AppBar(
