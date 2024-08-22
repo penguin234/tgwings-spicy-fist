@@ -93,14 +93,18 @@ app.post('/user/qr', (req,res) => {                     //qr코드 발급
 })
 app.get('/user/seat', (req, res) => {                   //예약한 자리 정보 확인
     const id = req.body.id
-    const session = req.body.session
-    if (session != database.getSession(id) && session) {
+
+    const sessionRecv = req.body.session
+    const session = database.getSession(id)
+
+    if (CheckSession(sessionRecv, session) && session) {
         res.status(401).json({
             ok: false,
             err: 'incorrect Session'
         })
         return
     }
+
     const data = database.getSeatById(id)
     if(data.length === 0) {                          //예약한 자리가 없는 상태
         res.status(404).json({
@@ -118,14 +122,18 @@ app.get('/user/seat', (req, res) => {                   //예약한 자리 정�
 
 app.put('/user/reserve', (req,res) => {                 //자리 예약, 예약x -> 예약o
     const id = req.body.id
-    const session = req.body.session
-    if (session != database.getSession(id) && session) {
+
+    const sessionRecv = req.body.session
+    const session = database.getSession(id)
+
+    if (CheckSession(sessionRecv, session) && session) {
         res.status(401).json({
             ok: false,
             err: 'incorrect Session'
         })
         return
     }
+
     if(database.getSeatById(id).length != 0) {      //이미 예약한 자리 존재
         res.status(400)
     }
@@ -150,14 +158,18 @@ app.put('/user/reserve', (req,res) => {                 //자리 예약, 예약x
 
 app.put('/user/reserve/off', (req, res) => {                //자리 예약, 예약 o -> 예약 x
     const id = req.body.id
-    const session = req.body.session
-    if (session != database.getSession(id) && session) {
+
+    const sessionRecv = req.body.session
+    const session = database.getSession(id)
+
+    if (CheckSession(sessionRecv, session) && session) {
         res.status(401).json({
             ok: false,
             err: 'incorrect Session'
         })
         return
     }
+
     const data = database.getSeatById(id)
 
     if (data.length == 0) {                          //예약한 자리 없음
@@ -180,14 +192,18 @@ app.put('/user/reserve/off', (req, res) => {                //자리 예약, 예
 
 app.put('/seats/time/add', (req, res) => {                  //시간 연장
     const id = req.body.id
-    const session = req.body.session
-    if (session != database.getSession(id) && session) {
+
+    const sessionRecv = req.body.session
+    const session = database.getSession(id)
+
+    if (CheckSession(sessionRecv, session) && session) {
         res.status(401).json({
             ok: false,
             err: 'incorrect Session'
         })
         return
     }
+
     const data = database.getSeatById(id)
 
     if (data.addCount == 0) {                       //연장 가능 횟수가 남아있지 않음
@@ -209,14 +225,18 @@ app.put('/seats/time/add', (req, res) => {                  //시간 연장
 
 app.post('/seats/reserve/reserve', (req,res) => {           //예약의 예약 추가
     const id = req.body.id
-    const session = req.body.session
-    if (session != database.getSession(id) && session) {
+
+    const sessionRecv = req.body.session
+    const session = database.getSession(id)
+
+    if (CheckSession(sessionRecv, session) && session) {
         res.status(401).json({
             ok: false,
             err: 'incorrect Session'
         })
         return
     }
+    
     const seatNumber = req.body.seatNumber
     database.getSeatBySeatNumber(seatNumber)[reserveReserve].append(id)     //seat DB의 reserveReserve키의 벨류값은 리스트
 
