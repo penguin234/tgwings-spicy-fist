@@ -26,7 +26,7 @@ const setSession = function(id,cookie) {
 }
 
 const getSession = function(id) {
-    return session.find(user => user.id == id)
+    return session.find(user => user.id == id)['Cookie'];
 }
 
 

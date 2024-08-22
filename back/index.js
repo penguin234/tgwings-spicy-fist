@@ -20,6 +20,12 @@ const database = require('./database/index')            //데이터베이스 파
 //로그인 필요 없음
 //회원가입 필요 없음
 
+function CheckSession(s1, s2) {
+    const r1 = String(s1)
+    const r2 = String(s2).split("'")[1]
+    return r1 == r2
+}
+
 app.post('/user/login', (req, res) => {
     const id = req.body.id                         //로그인시 아이디
     const pw = req.body.pw                //로그인시 비밀번호
@@ -53,8 +59,10 @@ app.post('/user/qr', (req,res) => {                     //qr코드 발급
         return
     }
 
-    const session = req.body.session
-    if (session != database.getSession(id) && session) {
+    const sessionRecv = req.body.session
+    const session = database.getSession(id)
+
+    if (CheckSession(sessionRecv, session) && session) {
         res.status(401).json({
             ok: false,
             err: 'incorrect Session'
