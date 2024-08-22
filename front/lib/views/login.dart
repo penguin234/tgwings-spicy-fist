@@ -2,6 +2,8 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tgthon/views/mainpage.dart';
+import 'package:tgthon/views/qrPage.dart';
+import 'package:tgthon/views/seatReservePage.dart';
 import 'dart:math';
 import 'data.dart';
 import 'package:http/http.dart' as http;
@@ -157,11 +159,14 @@ class _MyLoginPageState extends State<MyLoginPage> {
                     ),
                     onPressed: () async{
                       try {
-                        final res = await login(_idController.text, _pwController.text); //login 함수 호출, 백엔드에 입력받은 id와 pw 전송
+                        final res = await login(_idController.text, _pwController.text);
                         final studentData = jsonDecode(res.body) as Map<String, dynamic>;
+                        if (studentData['ok'] == false) {
+                          throw Exception(studentData['err']);
+                        }
                         Navigator.of(context).push(
                             MaterialPageRoute(
-                                builder: (context) => MainPage(studentData)));
+                                builder: (context) => MainPage(studentData))); //디버깅용으로 바꿔놓았는지 확인
                       }
                       catch (e) {
                         showSnackbar(context, '로그인 실패');
@@ -179,7 +184,6 @@ class _MyLoginPageState extends State<MyLoginPage> {
             right: 5.0,
             child: LayoutBuilder(
               builder: (context, constraints) {
-                final maxWidth = constraints.maxWidth;
                 final quote = goldenQuotes[Random().nextInt(goldenQuotes.length)];
                 return AutoSizeText(
                   quote,

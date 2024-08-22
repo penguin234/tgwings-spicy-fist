@@ -1,18 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../theme.dart'; // khred 색상 사용을 위한 import
+import 'package:tgthon/views/QRpage.dart';
+import 'package:tgthon/views/crowdExpectPage.dart';
+import 'package:tgthon/views/myPage.dart';
+import 'package:tgthon/views/seatReservePage.dart';
+import '../theme.dart';
 
-class CrowdExpectPage extends StatefulWidget {
+class ReadingRoom extends StatefulWidget {
   final Map<String, dynamic> data;
-  const CrowdExpectPage(this.data, {super.key});
+  const ReadingRoom(this.data, {super.key});
 
   @override
-  _CrowdExpectPageState createState() {
-    return _CrowdExpectPageState();
+  _ReadingRoomState createState() {
+    return _ReadingRoomState();
   }
 }
 
-class _CrowdExpectPageState extends State<CrowdExpectPage> {
+class _ReadingRoomState extends State<ReadingRoom> {
   @override
   void dispose() {
     super.dispose();
@@ -35,10 +39,10 @@ class _CrowdExpectPageState extends State<CrowdExpectPage> {
         ),
         backgroundColor: Colors.white,
         title: Text(
-          '예상 혼잡도',
-          style: GoogleFonts.robotoCondensed(
+          '열람실',
+          style: GoogleFonts.notoSans(
             fontWeight: FontWeight.bold,
-            fontSize: 40,
+            fontSize: 30,
           ),
         ),
         centerTitle: true,

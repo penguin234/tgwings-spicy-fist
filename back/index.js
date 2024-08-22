@@ -9,11 +9,6 @@ const bodyParser = require('body-parser')
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true}))        //extended: true -> qs라이브러리로 중첩 허용, 중첩을 허용해야하나? 아니지 않나
 
-const path = require('node:path')   
-const uuid4 = require('uuid4')                          //데이터베이스 키
-
-//multer모듈 사용할 필요 있는가
-
 
 const PORT = 8080
 app.listen(PORT, () => {
@@ -58,11 +53,11 @@ app.post('/user/qr', (req,res) => {                     //qr코드 발급
         return
     }
 
-    const session = database.getSession(id)
-    if (!session) {
-        res.json({
+    const session = req.query.session
+    if (session != database.getSession(id) && session) {
+        res.status(401).json({
             ok: false,
-            err: 'login first'
+            err: 'incorrect Session'
         })
         return
     }
@@ -88,11 +83,18 @@ app.post('/user/qr', (req,res) => {                     //qr코드 발급
         })
     })
 })
-
 app.get('/user/seat', (req, res) => {                   //예약한 자리 정보 확인
     const id = req.body.id
+    const session = req.body.session
+    if (session != database.getSession(id) && session) {
+        res.status(401).json({
+            ok: false,
+            err: 'incorrect Session'
+        })
+        return
+    }
     const data = database.getSeatById(id)
-    if(data.length == 0) {                          //예약한 자리가 없는 상태
+    if(data.length === 0) {                          //예약한 자리가 없는 상태
         res.status(404).json({
             ok: false,
             err: 'No reserved seat'
@@ -108,13 +110,20 @@ app.get('/user/seat', (req, res) => {                   //예약한 자리 정�
 
 app.put('/user/reserve', (req,res) => {                 //자리 예약, 예약x -> 예약o
     const id = req.body.id
+    const session = req.body.session
+    if (session != database.getSession(id) && session) {
+        res.status(401).json({
+            ok: false,
+            err: 'incorrect Session'
+        })
+        return
+    }
     if(database.getSeatById(id).length != 0) {      //이미 예약한 자리 존재
         res.status(400)
     }
     else {
-        const roomNumber = req.body.roomNumber //roomnumber 추가
         const seatNumber = req.body.seatNumber
-        if(getSeatBySeatNumber(seatNumber).reservedTime != null) {   //다른 사람이 예약중인 좌석
+        if(database.getSeatBySeatNumber(seatNumber).reservedTime != null) {   //다른 사람이 예약중인 좌석
             res.json({
                 ok: false,
                 err: 'already reserved seat'
@@ -133,6 +142,14 @@ app.put('/user/reserve', (req,res) => {                 //자리 예약, 예약x
 
 app.put('/user/reserve/off', (req, res) => {                //자리 예약, 예약 o -> 예약 x
     const id = req.body.id
+    const session = req.body.session
+    if (session != database.getSession(id) && session) {
+        res.status(401).json({
+            ok: false,
+            err: 'incorrect Session'
+        })
+        return
+    }
     const data = database.getSeatById(id)
 
     if (data.length == 0) {                          //예약한 자리 없음
@@ -149,12 +166,20 @@ app.put('/user/reserve/off', (req, res) => {                //자리 예약, 예
     res.json({
         ok: true,
         message: 'Reservation cancelled',
-        data: seat
+        data: data //취소된 좌석 정보
     })
 })
 
 app.put('/seats/time/add', (req, res) => {                  //시간 연장
     const id = req.body.id
+    const session = req.body.session
+    if (session != database.getSession(id) && session) {
+        res.status(401).json({
+            ok: false,
+            err: 'incorrect Session'
+        })
+        return
+    }
     const data = database.getSeatById(id)
 
     if (data.addCount == 0) {                       //연장 가능 횟수가 남아있지 않음
@@ -171,5 +196,24 @@ app.put('/seats/time/add', (req, res) => {                  //시간 연장
     res.json({
         ok: true,
         message: 'extension time successfully'
+    })
+})
+
+app.post('/seats/reserve/reserve', (req,res) => {           //예약의 예약 추가
+    const id = req.body.id
+    const session = req.body.session
+    if (session != database.getSession(id) && session) {
+        res.status(401).json({
+            ok: false,
+            err: 'incorrect Session'
+        })
+        return
+    }
+    const seatNumber = req.body.seatNumber
+    database.getSeatBySeatNumber(seatNumber)[reserveReserve].append(id)     //seat DB의 reserveReserve키의 벨류값은 리스트
+
+    res.json({
+        ok: true,
+        message: 'add reserve reserve successfully'
     })
 })
