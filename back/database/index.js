@@ -43,11 +43,11 @@ const reserveSeat = function(seatNumber, id, reservedTime, time) {
 
 const deleteSeat = function(seat) {
     console.log('Before deletion:', JSON.stringify(seat, null, 2));
-    if (seat&&seat.id!==null) {
-        seat.id = null;
-        seat.reservedTime = null;
-        seat.time = null;
-        seat.addCount=3;
+    if (seat&&seat[0].id!==null) {
+        seat[0].id= null;
+        seat[0].reservedTime = null;
+        seat[0].time = null;
+        seat[0].addCount = 3;
         console.log('After deletion:', JSON.stringify(seat, null, 2));
     } else {
         console.log('Unavailable delete');

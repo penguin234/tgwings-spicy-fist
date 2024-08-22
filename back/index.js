@@ -96,7 +96,7 @@ app.get('/user/seat', (req, res) => {                   //예약한 자리 정�
 
     const sessionRecv = req.body.session
     const session = database.getSession(id)
-
+    console.log(database.seats)
     if (CheckSession(sessionRecv, session) && session) {
         res.status(401).json({
             ok: false,
@@ -115,7 +115,6 @@ app.get('/user/seat', (req, res) => {                   //예약한 자리 정�
     }
 
     res.json(data)
-    
 })
 
 //자리 예약할 때 시간을 어떻게 처리할지 잘 모르겠음
@@ -125,7 +124,8 @@ app.put('/user/reserve', (req,res) => {                 //자리 예약, 예약x
 
     const sessionRecv = req.body.session
     const session = database.getSession(id)
-
+    let data2 = database.getSeatById(id)
+    console.log(data2,"data2");
     if (CheckSession(sessionRecv, session) && session) {
         res.status(401).json({
             ok: false,
@@ -136,6 +136,7 @@ app.put('/user/reserve', (req,res) => {                 //자리 예약, 예약x
 
     if(database.getSeatById(id).length != 0) {      //이미 예약한 자리 존재
         res.status(400)
+        return
     }
     else {
         const seatNumber = req.body.seatNumber
@@ -170,7 +171,9 @@ app.put('/user/reserve/off', (req, res) => {                //자리 예약, 예
         return
     }
 
-    const data = database.getSeatById(id)
+    let data = database.getSeatById(id)
+    console.log(data,"data");
+    console.log(data.length,"data.length");
 
     if (data.length == 0) {                          //예약한 자리 없음
         res.status(404).json({
