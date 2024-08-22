@@ -89,20 +89,8 @@ app.post('/user/qr', (req,res) => {                     //qr코드 발급
     })
 })
 
-app.get('/user/qr/check', (req, res) => {               //qr 확인      
-    const id = req.query.id
-    const data = database.getQrById(id)
-    if (data.length == 0) {                         //qr이 발급되지 않은 상태
-        res.status(404)
-    }
-    else {
-        let qr = data[0]
-        res.json(qr)
-    }
-})
-
 app.get('/user/seat', (req, res) => {                   //예약한 자리 정보 확인
-    const id = req.query.id
+    const id = req.body.id
     const data = database.getSeatById(id)
     if(data.length == 0) {                          //예약한 자리가 없는 상태
         res.status(404).json({
@@ -119,7 +107,7 @@ app.get('/user/seat', (req, res) => {                   //예약한 자리 정�
 //자리 예약할 때 시간을 어떻게 처리할지 잘 모르겠음
 
 app.put('/user/reserve', (req,res) => {                 //자리 예약, 예약x -> 예약o
-    const id = req.query.id
+    const id = req.body.id
     if(database.getSeatById(id).length != 0) {      //이미 예약한 자리 존재
         res.status(400)
     }
@@ -144,7 +132,7 @@ app.put('/user/reserve', (req,res) => {                 //자리 예약, 예약x
 })
 
 app.put('/user/reserve/off', (req, res) => {                //자리 예약, 예약 o -> 예약 x
-    const id = req.query.id
+    const id = req.body.id
     const data = database.getSeatById(id)
 
     if (data.length == 0) {                          //예약한 자리 없음
@@ -166,7 +154,7 @@ app.put('/user/reserve/off', (req, res) => {                //자리 예약, 예
 })
 
 app.put('/seats/time/add', (req, res) => {                  //시간 연장
-    const id = req.query.id
+    const id = req.body.id
     const data = database.getSeatById(id)
 
     if (data.addCount == 0) {                       //연장 가능 횟수가 남아있지 않음
