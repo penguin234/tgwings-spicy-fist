@@ -84,8 +84,8 @@ app.post('/user/qr', (req,res) => {                     //qr코드 발급
     })
 })
 app.get('/user/seat', (req, res) => {                   //예약한 자리 정보 확인
-    const id = req.query.id
-    const session = req.query.session
+    const id = req.body.id
+    const session = req.body.session
     if (session != database.getSession(id) && session) {
         res.status(401).json({
             ok: false,
@@ -109,8 +109,8 @@ app.get('/user/seat', (req, res) => {                   //예약한 자리 정�
 //자리 예약할 때 시간을 어떻게 처리할지 잘 모르겠음
 
 app.put('/user/reserve', (req,res) => {                 //자리 예약, 예약x -> 예약o
-    const id = req.query.id
-    const session = req.query.session
+    const id = req.body.id
+    const session = req.body.session
     if (session != database.getSession(id) && session) {
         res.status(401).json({
             ok: false,
@@ -141,8 +141,8 @@ app.put('/user/reserve', (req,res) => {                 //자리 예약, 예약x
 })
 
 app.put('/user/reserve/off', (req, res) => {                //자리 예약, 예약 o -> 예약 x
-    const id = req.query.id
-    const session = req.query.session
+    const id = req.body.id
+    const session = req.body.session
     if (session != database.getSession(id) && session) {
         res.status(401).json({
             ok: false,
@@ -171,8 +171,8 @@ app.put('/user/reserve/off', (req, res) => {                //자리 예약, 예
 })
 
 app.put('/seats/time/add', (req, res) => {                  //시간 연장
-    const id = req.query.id
-    const session = req.query.session
+    const id = req.body.id
+    const session = req.body.session
     if (session != database.getSession(id) && session) {
         res.status(401).json({
             ok: false,
@@ -200,8 +200,8 @@ app.put('/seats/time/add', (req, res) => {                  //시간 연장
 })
 
 app.post('/seats/reserve/reserve', (req,res) => {           //예약의 예약 추가
-    const id = req.query.id
-    const session = req.query.session
+    const id = req.body.id
+    const session = req.body.session
     if (session != database.getSession(id) && session) {
         res.status(401).json({
             ok: false,
