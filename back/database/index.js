@@ -7,7 +7,8 @@ const totalSeats=20;//자대 열람실 자리 수
             id: null,
             reservedTime: null,
             time: null,
-            addCount: 3
+            addCount: 3,
+            reserveReserve: []
         });
     }
 const session=[];
