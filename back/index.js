@@ -53,7 +53,7 @@ app.post('/user/qr', (req,res) => {                     //qr코드 발급
         return
     }
 
-    const session = req.query.session
+    const session = req.body.session
     if (session != database.getSession(id) && session) {
         res.status(401).json({
             ok: false,
@@ -62,8 +62,8 @@ app.post('/user/qr', (req,res) => {                     //qr코드 발급
         return
     }
 
-    database.getMID(session.Cookie, (mid) => {
-        database.getQR(mid, session.Cookie, (QR) => {
+    database.getMID(session, (mid) => {
+        database.getQR(mid, session, (QR) => {
             res.json({
                 ok: true,
                 QR: QR
