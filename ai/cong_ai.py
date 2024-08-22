@@ -2,7 +2,15 @@ import joblib
 import pandas as pd
 import math
 
-def load_and_predict(future_data):
+columns = ['1f_1_cong', '1f_but_cong', '2f_he_cong', '2f_2_cong']
+
+models = {}
+for column in columns:
+    model_filename = "pkl/" + f"{column}_model.pkl"
+    model = joblib.load(model_filename)
+    models[column] = model
+
+def load_and_predict(future_data, target_column):
     max_seats = {
     '1f_1_cong': 410,
     '1f_but_cong': 156,
@@ -18,9 +26,7 @@ def load_and_predict(future_data):
     future_data['dayofweek'] = future_data['datetime'].dt.dayofweek
     future_X = future_data[['year', 'month', 'day', 'hour', 'dayofweek']]
 
-    model_filename = "ai/pkl/" + f"{target_column}_model.pkl"
-    model = joblib.load(model_filename)
-    prediction = model.predict(future_X)
+    prediction = models[target_column].predict(future_X)
     
     predicted_seats = math.floor(prediction[0])
     
@@ -37,5 +43,6 @@ future_data = pd.DataFrame({
 })
 
 print("\nLoading models and making predictions:")
-for target_column in ['1f_1_cong', '1f_but_cong', '2f_he_cong', '2f_2_cong']:
-    load_and_predict(future_data)
+for i in range(100):
+    for target_column in ['1f_1_cong', '1f_but_cong', '2f_he_cong', '2f_2_cong']:
+        load_and_predict(future_data, target_column)
