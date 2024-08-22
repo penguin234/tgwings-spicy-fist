@@ -96,7 +96,6 @@ app.get('/user/seat', (req, res) => {                   //예약한 자리 정�
 
     const sessionRecv = req.body.session
     const session = database.getSession(id)
-    console.log(database.seats)
     if (CheckSession(sessionRecv, session) && session) {
         res.status(401).json({
             ok: false,
@@ -121,11 +120,8 @@ app.get('/user/seat', (req, res) => {                   //예약한 자리 정�
 
 app.put('/user/reserve', (req,res) => {                 //자리 예약, 예약x -> 예약o
     const id = req.body.id
-
     const sessionRecv = req.body.session
     const session = database.getSession(id)
-    let data2 = database.getSeatById(id)
-    console.log(data2,"data2");
     if (CheckSession(sessionRecv, session) && session) {
         res.status(401).json({
             ok: false,
@@ -172,9 +168,6 @@ app.put('/user/reserve/off', (req, res) => {                //자리 예약, 예
     }
 
     let data = database.getSeatById(id)
-    console.log(data,"data");
-    console.log(data.length,"data.length");
-
     if (data.length == 0) {                          //예약한 자리 없음
         res.status(404).json({
             ok: false,
