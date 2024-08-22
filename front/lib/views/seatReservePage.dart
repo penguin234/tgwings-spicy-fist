@@ -65,7 +65,7 @@ class _SeatReservePageState extends State<SeatReservePage> {
           ),
           Column(
             children: [
-              SizedBox(height: 50), // AppBar와 첫 번째 카드 사이의 간격
+              SizedBox(height: 50),
               ...readingRooms.map((room) {
                 return Flexible(
                   child: Padding(
@@ -140,7 +140,7 @@ class _SeatReservePageState extends State<SeatReservePage> {
                   ),
                 );
               }).toList(),
-              SizedBox(height: 50), // 마지막 카드와 화면 바닥 사이의 간격
+              SizedBox(height: 50),
             ],
           ),
         ],

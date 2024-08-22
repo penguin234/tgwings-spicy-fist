@@ -159,7 +159,7 @@ class _MyLoginPageState extends State<MyLoginPage> {
                     ),
                     onPressed: () async{
                       try {
-                        final res = await login(_idController.text, _pwController.text); //login 함수 호출, 백엔드에 입력받은 id와 pw 전송
+                        final res = await login(_idController.text, _pwController.text);
                         final studentData = jsonDecode(res.body) as Map<String, dynamic>;
                         if (studentData['ok'] == false) {
                           throw Exception(studentData['err']);

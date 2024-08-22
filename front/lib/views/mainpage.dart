@@ -29,7 +29,7 @@ class _MainPageState extends State<MainPage> {
       color: Colors.white70,
     );
 
-    final double buttonSize = MediaQuery.of(context).size.width * 0.5; // 버튼 크기 계산
+    final double buttonSize = MediaQuery.of(context).size.width * 0.5;
 
     return Scaffold(
       appBar: AppBar(
@@ -97,7 +97,7 @@ class _MainPageState extends State<MainPage> {
           ),
           Center(
             child: Container(
-              width: buttonSize * 2, // 전체 너비 계산
+              width: buttonSize * 2,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -135,7 +135,7 @@ class _MainPageState extends State<MainPage> {
                       ),
                     ],
                   ),
-                  SizedBox(height: 20), // 1행과 2행 사이의 여백
+                  SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -185,8 +185,8 @@ class _MainPageState extends State<MainPage> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Container(
-          height: size, // 버튼의 높이 설정
-          width: size, // 버튼의 너비 설정
+          height: size,
+          width: size,
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12.0),
@@ -201,10 +201,10 @@ class _MainPageState extends State<MainPage> {
           child: IconButton(
             icon: Icon(
               icon,
-              size: size * 0.5, // 아이콘 크기 설정
+              size: size * 0.5,
               color: khblue,
             ),
-            onPressed: onPressed, // 버튼 클릭 시 동작
+            onPressed: onPressed,
           ),
         ),
         SizedBox(height: 8),
