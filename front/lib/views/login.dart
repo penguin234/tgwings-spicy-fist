@@ -11,13 +11,11 @@ import 'dart:convert';
 import '../theme.dart';
 import './utils.dart';
 
-
-
-class MyLoginPage extends StatefulWidget{
+class MyLoginPage extends StatefulWidget {
   const MyLoginPage({super.key});
 
   @override
-  _MyLoginPageState createState(){
+  _MyLoginPageState createState() {
     return _MyLoginPageState();
   }
 }
@@ -26,26 +24,23 @@ class _MyLoginPageState extends State<MyLoginPage> {
   final TextEditingController _idController = TextEditingController();
   final TextEditingController _pwController = TextEditingController();
 
-  Future<http.Response> login(String id, String pw){
-    return http.post(Uri.parse('http://localhost:8080/user/login'), //uri는 나중에 통신할 때 입력
+  Future<http.Response> login(String id, String pw) {
+    return http.post(Uri.parse('http://localhost:8080/user/login'), // uri는 나중에 통신할 때 입력
         headers: <String, String>{
           'Content-Type': 'application/json'
         },
-        body: jsonEncode(<String, String>{
-          'id': id,
-          'pw': pw
-        }));
+        body: jsonEncode(<String, String>{'id': id, 'pw': pw}));
   }
 
   @override
-  void dispose(){
+  void dispose() {
     _idController.dispose();
     _pwController.dispose();
     super.dispose();
   }
 
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -97,86 +92,95 @@ class _MyLoginPageState extends State<MyLoginPage> {
               ),
             ),
           ),
-          Positioned(
-              top: 200,
-              child: Image(
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image(
                 image: AssetImage('assets/KHU.png'),
                 width: 230,
-              )
-          ),
-          Center(
-            child: Container(
-              padding: EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8.0),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 10.0,
-                    offset: Offset(0, 2),
-                  ),
-                ],
               ),
-              width: 300,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    decoration: InputDecoration(
+              SizedBox(height: 16),
+              Container(
+                padding: EdgeInsets.all(16.0),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 10.0,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+                width: 300,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      decoration: InputDecoration(
                         labelText: 'ID',
                         border: OutlineInputBorder(),
                         focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: khblue,
-                              width: 2.0,
-                            )
-                        )
+                          borderSide: BorderSide(
+                            color: khblue,
+                            width: 2.0,
+                          ),
+                        ),
+                      ),
+                      controller: _idController,
                     ),
-                    controller: _idController,
-                  ),
-                  SizedBox(height: 16),
-                  TextField(
-                    decoration: InputDecoration(
+                    SizedBox(height: 16),
+                    TextField(
+                      decoration: InputDecoration(
                         labelText: 'PW',
                         border: OutlineInputBorder(),
                         focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: khblue,
-                              width: 2.0,
-                            )
-                        )
+                          borderSide: BorderSide(
+                            color: khblue,
+                            width: 2.0,
+                          ),
+                        ),
+                      ),
+                      obscureText: true,
+                      controller: _pwController,
                     ),
-                    obscureText: true,
-                    controller: _pwController,
-                  ),
-                  SizedBox(height: 16),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
+                    SizedBox(height: 16),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
                         backgroundColor: khblue,
                         surfaceTintColor: khblue,
-                        foregroundColor: Colors.white
-                    ),
-                    onPressed: () async{
-                      try {
-                        final res = await login(_idController.text, _pwController.text);
-                        final studentData = jsonDecode(res.body) as Map<String, dynamic>;
-                        if (studentData['ok'] == false) {
-                          throw Exception(studentData['err']);
-                        }
-                        Navigator.of(context).push(
+                        foregroundColor: Colors.white,
+                      ),
+                      onPressed: () async {
+                        try {
+                          final res = await login(_idController.text, _pwController.text);
+                          final studentData = jsonDecode(res.body) as Map<String, dynamic>;
+                          if (studentData['ok'] == false) {
+                            throw Exception(studentData['err']);
+                          }
+                          Navigator.of(context).push(
                             MaterialPageRoute(
-                                builder: (context) => MainPage(studentData))); //디버깅용으로 바꿔놓았는지 확인
-                      }
-                      catch (e) {
-                        showSnackbar(context, '로그인 실패');
-                      }
-                    },
-                    child: Text('Sign in'),
-                  ),
-                ],
+                              builder: (context) => MainPage(studentData),
+                            ),
+                          ); // 디버깅용으로 바꿔놓았는지 확인
+                        } catch (e) {
+                          showSnackbar(context, '로그인 실패');
+                        }
+                      },
+                      child: Text('Sign in'),
+                    ),
+                  ],
+                ),
               ),
-            ),
+              SizedBox(height: 16),
+              Image(
+                image: AssetImage('assets/KHU.png'),
+                width: 230,
+                color: Colors.transparent,
+              ),
+            ],
           ),
           Positioned(
             bottom: 16.0,

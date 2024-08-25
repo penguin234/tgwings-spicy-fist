@@ -132,7 +132,7 @@ class _SeatReservePageState extends State<SeatReservePage> {
                         ),
                         SizedBox(height: 5),
                         Text(
-                          room["inUse"].toString() + " / " + room["cnt"].toString(),
+                          (room["cnt"] - room["inUse"]).toString() + " / " + room["cnt"].toString() + " 이용 가능",
                           style: GoogleFonts.notoSans(
                             fontSize: 14,
                             color: Colors.black54,
@@ -143,14 +143,34 @@ class _SeatReservePageState extends State<SeatReservePage> {
                     ),
                   ),
                   SizedBox(width: 16),
-                  Container(
-                    width: 100,
-                    height: 10,
-                    child: LinearProgressIndicator(
-                      value: room["inUse"] / room["cnt"],
-                      backgroundColor: Colors.grey[300],
-                      valueColor: AlwaysStoppedAnimation<Color>(khblue),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "이걸 찾아?",
+                        style: GoogleFonts.notoSans(
+                          fontSize: 14,
+                          color: Colors.transparent
+                        ),
+                      ),
+                      Container(
+                      width: 100,
+                      height: 10,
+                      child: LinearProgressIndicator(
+                        value: room["inUse"] / room["cnt"],
+                        backgroundColor: Colors.grey[300],
+                        valueColor: AlwaysStoppedAnimation<Color>(khblue),
+                      ),
                     ),
+                      SizedBox(height: 8),
+                      Text(
+                        room["inUse"].toString() + " 이용 중",
+                        style: GoogleFonts.notoSans(
+                          fontSize: 14,
+                          color: Colors.black54,
+                        ),
+                      )
+                    ],
                   ),
                 ],
               ),
