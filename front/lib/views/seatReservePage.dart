@@ -94,7 +94,7 @@ class _SeatReservePageState extends State<SeatReservePage> {
           onTap: () {
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => ReadingRoom(widget.data),
+                builder: (context) => ReadingRoom(widget.data, room),
               ),
             );
           },
