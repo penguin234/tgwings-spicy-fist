@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../theme.dart'; // khred 색상 사용을 위한 import
+import '../theme.dart';
+import 'readingRoom.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
 
 class MyPage extends StatefulWidget {
   final Map<String, dynamic> data;
