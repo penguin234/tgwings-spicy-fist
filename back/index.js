@@ -26,19 +26,45 @@ function CheckSession(s1, s2) {
     return r1 == r2
 }
 
+const request = require('request')
+
 app.post('/user/login', (req, res) => {
     const id = req.body.id                         //로그인시 아이디
     const pw = req.body.pw                //로그인시 비밀번호
 
     database.login(id, pw, (data, cookie) => {
         database.setSession(data.id, cookie)
-        res.json({
-            ok: true,
-            name: data.name,
-            id: data.id,
-            cookie: cookie
-        })
 
+        // libseat login
+        request.post({
+            url: 'https://libseat.khu.ac.kr/login_library',
+            followAllRedirects: false,
+            form: {
+                STD_ID: data.id
+            },
+            headers: {
+                'User-Agent': 'request',
+                Cookie: cookie
+            }
+        }, function(err, result, body) {
+            if (err) {
+                console.log('lib login err', err)
+                res.status(400).json({
+                    ok: false,
+                    err: err
+                })
+                return
+            }
+
+            database.setSession2(data.id, result.headers['set-cookie'])
+
+            res.json({
+                ok: true,
+                name: data.name,
+                id: data.id,
+                cookie: cookie
+            })
+        })
     },
     (err) => {
         res.status(400).json({
@@ -47,6 +73,101 @@ app.post('/user/login', (req, res) => {
         })
     })
     
+})
+
+app.get('/user/status', (req, res) => {                 // 유저 정보 확인
+    const id = req.body.id
+    if (!id) {
+        res.json({
+            ok: false,
+            err: 'id is required'
+        })
+        return
+    }
+
+    const sessionRecv = req.body.session
+    const session = database.getSession(id)
+
+    if (CheckSession(sessionRecv, session) && session) {
+        res.status(401).json({
+            ok: false,
+            err: 'incorrect Session'
+        })
+        return
+    }
+
+    database.getUserInfo(database.getSession2(id), (data) => {
+        res.json({
+            ok: true,
+            data: data
+        })
+    }, (err) => {
+        res.status(404).json({
+            ok: false,
+            err: err
+        })
+    })
+})
+
+app.post('/user/seat/exit', (req, res) => {
+    const id = req.body.id
+    if (!id) {
+        res.json({
+            ok: false,
+            err: 'id is required'
+        })
+        return
+    }
+
+    const sessionRecv = req.body.session
+    const session = database.getSession(id)
+
+    if (CheckSession(sessionRecv, session) && session) {
+        res.status(401).json({
+            ok: false,
+            err: 'incorrect Session'
+        })
+        return
+    }
+
+    database.getUserInfo(database.getSession2(id), (data) => {
+        if (!data['data']['mySeat']) {
+            console.log('no seat err')
+            res.status(404).json({
+                ok: false,
+                err: 'no using seat'
+            })
+            return
+        }
+
+        request.post({
+            url: "https://libseat.khu.ac.kr/libraries/leave/" + String(data['data']['mySeat']['seat']['code']),
+            followAllRedirects: false,
+            headers: {
+                'User-Agent': 'request',
+                Cookie: database.getSession2(id)
+            }
+        }, function(err, result, body) {
+            if (err) {
+                console.log('lib login err', err)
+                res.status(400).json({
+                    ok: false,
+                    err: err
+                })
+                return
+            }
+
+            console.log('exit success')
+            res.json({
+                ok: true
+            })
+        })
+    }, (err) => {
+        res.status(404).json({
+            ok: false,
+            err: err
+        })
+    })
 })
 
 app.post('/user/qr', (req,res) => {                     //qr코드 발급
@@ -91,6 +212,7 @@ app.post('/user/qr', (req,res) => {                     //qr코드 발급
         })
     })
 })
+
 app.get('/user/seat', (req, res) => {                   //예약한 자리 정보 확인
     const id = req.body.id
 

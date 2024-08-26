@@ -24,9 +24,18 @@ const setSession = function(id,cookie) {
         sessionAvaliable.Cookie = cookie;
     }
 }
+const setSession2 = function(id, cookie) {
+    const sessionAvaliable = session.find(user => user.id === id);
+    if (sessionAvaliable) {
+        sessionAvaliable.Cookie2 = cookie
+    }
+}
 
 const getSession = function(id) {
     return session.find(user => user.id == id)['Cookie'];
+}
+const getSession2 = function(id) {
+    return session.find(user => user.id == id)['Cookie2'];
 }
 
 
@@ -209,6 +218,24 @@ function getQR(mid, cookie, callback, ecallback) {
     })
 }
 
+function getUserInfo(cookie, callback, ecallback) {
+    request.get({
+        url: 'https://libseat.khu.ac.kr/user/my-status',
+        headers: {
+            'User-Agent': 'request',
+            Cookie: cookie
+        }
+    }, function(err, res, body) {
+        if (err) {
+            console.log('err at getUserInfo', err)
+            ecallback(err)
+            return
+        }
+
+        callback(JSON.parse(body))
+    })
+}
+
 module.exports = {
-    seats, reserveSeat, deleteSeat, getSeatBySeatNumber, getSeatById, addTime, getQR, login,getMID, setSession, getSession
+    seats, reserveSeat, deleteSeat, getSeatBySeatNumber, getSeatById, addTime, getQR, login,getMID, setSession, getSession, setSession2, getSession2, getUserInfo
 };
