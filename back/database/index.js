@@ -18,7 +18,8 @@ const setSession = function(id,cookie) {
     if (!sessionAvaliable) {
     session.push({
         id: id,
-        Cookie: cookie
+        Cookie: cookie,
+        reserveReserve: []
     });}
     else {
         sessionAvaliable.Cookie = cookie;

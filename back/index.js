@@ -357,9 +357,43 @@ app.post('/seats/reserve/reserve', (req,res) => {           //예약의 예약 �
     
     const seatNumber = req.body.seatNumber
     database.getSeatBySeatNumber(seatNumber)[reserveReserve].append(id)     //seat DB의 reserveReserve키의 벨류값은 리스트
+    session.reserveReserve.append(seatNumber)
 
     res.json({
         ok: true,
         message: 'add reserve reserve successfully'
+    })
+})
+
+app.post('/seats/reserve/reserve/off', (req,res) => {
+    const id = req.body.id
+
+    const sessionRecv = req.body.session
+    const session = database.getSession(id)
+
+    if (CheckSession(sessionRecv, session) && session) {
+        res.status(401).json({
+            ok: false,
+            err: 'incorrect Session'
+        })
+        return
+    }
+    const seatNumber = req.body.seatNumber
+    if(!session.reserveReserve.include(seatNumber)) {
+        res.json({
+            ok: false,
+            err: 'No reserve reserve found'
+        })
+        return
+    }
+
+    const index = session.reserveReserve.indexOf(seatNumber);
+    if (index !== -1) {
+        session.reserveReserve.splice(index, 1);
+    }
+
+    res.json({
+        ok: true,
+        message: 'delete reserve reserve successfully'
     })
 })
