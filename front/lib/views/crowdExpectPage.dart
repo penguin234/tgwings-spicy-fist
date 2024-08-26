@@ -8,7 +8,9 @@ import 'dart:convert';
 Future<List<dynamic>> getRooms() async {
   final res = await http.get(Uri.parse('https://libseat.khu.ac.kr/libraries/lib-status/2'));
   final data = jsonDecode(res.body) as Map<String, dynamic>;
-  return data['data'] as List<dynamic>;
+  var ls = data['data'] as List<dynamic>;
+  ls.add(ls[0]);
+  return ls;
 }
 
 class CrowdExpectPage extends StatefulWidget {
@@ -103,7 +105,7 @@ class _CrowdExpectPageState extends State<CrowdExpectPage> {
             ),
           ),
           Column(
-            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Divider(
                 color: Colors.black,
@@ -155,107 +157,104 @@ class _CrowdExpectPageState extends State<CrowdExpectPage> {
                   ),
                 ),
               ),
-             /* FutureBuilder<List<dynamic>>(future: getRooms(), builder: (context, snapshot) {
+              Spacer(flex: 1),
+              FutureBuilder<List<dynamic>>(future: getRooms(), builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   return Column(
-                    children: [
-                      SizedBox(height: 50),
-                      ...snapshot.data!.map(fromRoom).toList(),
-                      SizedBox(height: 50),
-                    ],
+                    children: snapshot.data!.map<Widget>((roomData) {
+                      return fromRoom(roomData);
+                    }).toList(),
                   );
                 }
                 return Text("Loading...");
-              }), 이 부분 이상함 */
+              }),
+              Spacer(flex: 1), // 마지막 Card와 화면 하단 사이의 간격
             ],
           )
         ],
       ),
     );
   }
+
   Widget fromRoom(dynamic roomData) {
     final room = roomData as Map<String, dynamic>;
-    return Flexible(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 15.0),
-        child: InkWell(
-          child: Card(
-            color: Colors.white,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 15.0),
+      child: Card(
+        color: Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        SizedBox(height: 20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text(
-                              room["name"]!,
-                              style: GoogleFonts.notoSans(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
-                              ),
-                            ),
-                            SizedBox(width: 5),
-                            Text(
-                              formatTime(room["startTm"], room["endTm"]),
-                              style: GoogleFonts.notoSans(
-                                fontSize: 12,
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 5),
                         Text(
-                          (room["cnt"] - room["inUse"]).toString() + " / " + room["cnt"].toString() + " 이용 가능",
+                          room["name"]!,
                           style: GoogleFonts.notoSans(
-                            fontSize: 14,
-                            color: Colors.black54,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
                           ),
                         ),
-                        SizedBox(height: 20),
+                        SizedBox(width: 5),
+                        Text(
+                          formatTime(room["startTm"], room["endTm"]),
+                          style: GoogleFonts.notoSans(
+                            fontSize: 12,
+                            color: Colors.grey[600],
+                          ),
+                        ),
                       ],
                     ),
-                  ),
-                  SizedBox(width: 16),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "이걸 찾아?",
-                        style: GoogleFonts.notoSans(
-                            fontSize: 14,
-                            color: Colors.transparent
-                        ),
+                    SizedBox(height: 5),
+                    Text(
+                      room["inUse"].toString() + " / " + room["cnt"].toString() + " 이용 예상",
+                      style: GoogleFonts.notoSans(
+                        fontSize: 14,
+                        color: Colors.black54,
                       ),
-                      Container(
-                        width: 100,
-                        height: 10,
-                        child: LinearProgressIndicator(
-                          value: room["inUse"] / room["cnt"],
-                          backgroundColor: Colors.grey[300],
-                          valueColor: AlwaysStoppedAnimation<Color>(khblue),
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        room["inUse"].toString() + " 이용 중",
-                        style: GoogleFonts.notoSans(
-                          fontSize: 14,
-                          color: Colors.black54,
-                        ),
-                      )
-                    ],
+                    ),
+                    SizedBox(height: 20),
+                  ],
+                ),
+              ),
+              SizedBox(width: 16),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "이걸 찾아?",
+                    style: GoogleFonts.notoSans(
+                        fontSize: 14,
+                        color: Colors.transparent
+                    ),
                   ),
+                  Container(
+                    width: 100,
+                    height: 10,
+                    child: LinearProgressIndicator(
+                      value: room["inUse"] / room["cnt"],
+                      backgroundColor: Colors.grey[300],
+                      valueColor: AlwaysStoppedAnimation<Color>(khblue),
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    "혼잡도(ex: 원활)",
+                    style: GoogleFonts.notoSans(
+                      fontSize: 14,
+                      color: Colors.black54,
+                    ),
+                  )
                 ],
               ),
-            ),
+            ],
           ),
         ),
       ),
