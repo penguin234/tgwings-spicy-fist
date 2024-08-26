@@ -152,12 +152,12 @@ class _ReadingRoomState extends State<ReadingRoom> {
 
     if (widget.room['code'] == 10) {
       // 벗터
-      xpos *= 0.8;
-      ypos *= 0.8;
-      xpos += 100;
-      ypos += 100;
-      width *= 0.8;
-      height *= 0.8;
+      //xpos *= 0.8;
+      ypos *= 0.72;
+      //xpos += 100;
+      ypos += 30;
+      //width *= 0.8;
+      height *= 0.72;
     }
 
     return Positioned(
