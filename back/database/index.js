@@ -83,14 +83,16 @@ const checkAndResetSeats = () => {
 
             if (now >= reservationEnd) {
                 console.log(`Resetting seat ${seat.seatNumber} as its reservation has expired.`);
-                deleteSeat(seat);
+                seatArray=[];
+                seatArray.push(seat);
+                deleteSeat(seatArray);
             }
         }
     });
 };
 
 // Run the check every minute
-//setInterval(checkAndResetSeats, 60000); // 60000 ms = 1 minute
+setInterval(checkAndResetSeats, 60000); // 60000 ms = 1 minute
 
 
 
