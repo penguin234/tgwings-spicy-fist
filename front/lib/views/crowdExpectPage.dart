@@ -179,13 +179,6 @@ class _CrowdExpectPageState extends State<CrowdExpectPage> {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 15.0),
         child: InkWell(
-          onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => ReadingRoom(widget.data),
-              ),
-            );
-          },
           child: Card(
             color: Colors.white,
             child: Padding(
