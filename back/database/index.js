@@ -84,9 +84,9 @@ const checkAndResetSeats = () => {
             const reservationEnd = DateTime.fromISO(seat.reservedTime).plus({ minutes: seat.time });
             const now = DateTime.now();
 
-            if (30000 <= reservationEnd - now && reservationEnd - now < 31000) {            // Before 30 minutes
-                console.log("Before 30 minutes");                                           // 1800000 over 1860000 under
-            }
+            if (1800000 <= reservationEnd - now && reservationEnd - now < 1810000) {            // Before 30 minutes
+                console.log("Before 30 minutes");                                           // 1800000 over 1860000 under if interval is 1 minute
+            }//test: 30000 over 40000 under if interval is 10 second
 
             if (now >= reservationEnd) {
                 console.log(`Resetting seat ${seat.seatNumber} as its reservation has expired.`);
@@ -100,7 +100,6 @@ const checkAndResetSeats = () => {
 
 // Run the check every minute
 setInterval(checkAndResetSeats, 10000); // 60000 ms = 1 minute
-
 
 
 //database Qr: made by 황재현 v.2024-07-25
