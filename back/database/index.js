@@ -1,6 +1,6 @@
 //databse seat: made by 김성민 v.2024-08-15 
 let seats = [];
-const totalSeats=20;//자대 열람실 자리 수
+const totalSeats=47;//자대 열람실 자리 수
     for (let i = 1; i <= totalSeats; i++) {
         seats.push({
             seatNumber: i,
