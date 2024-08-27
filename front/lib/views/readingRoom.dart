@@ -292,8 +292,6 @@ void reserveDialog(BuildContext context, Map<String, dynamic> seat) {
                         flex: 1,
                         child: Column(
                           children: [
-                            InfoBox(title: "사용시간", content: "4시간 이용 가능석"),
-                            SizedBox(height: 8),
                             InfoBox(title: "입실확인", content: "HH:MM까지"),
                             SizedBox(height: 8),
                             InfoBox(title: "배정시간", content: "HH:MM까지"),
@@ -380,7 +378,9 @@ class InfoBox extends StatelessWidget {
           Spacer(),
           Text(
             content,
-            style: GoogleFonts.notoSans(),
+            style: GoogleFonts.notoSans(
+              fontSize: 12,
+            ),
           ),
         ],
       ),
