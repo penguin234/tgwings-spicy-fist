@@ -38,6 +38,9 @@ const getSession = function(id) {
 const getSession2 = function(id) {
     return session.find(user => user.id == id)['Cookie2'];
 }
+const getSession3= function(id) {
+    return session.find(user => user,id == id)['reserveReserve'];
+}
 
 
 const reserveSeat = function(seatNumber, id, reservedTime, time) {
@@ -240,5 +243,5 @@ function getUserInfo(cookie, callback, ecallback) {
 }
 
 module.exports = {
-    seats, reserveSeat, deleteSeat, getSeatBySeatNumber, getSeatById, addTime, getQR, login,getMID, setSession, getSession, setSession2, getSession2, getUserInfo
+    seats, reserveSeat, deleteSeat, getSeatBySeatNumber, getSeatById, addTime, getQR, login,getMID, setSession, getSession, setSession2, getSession2, getUserInfo, getSession3
 };

@@ -410,10 +410,12 @@ app.post('/seats/reserve/reserve', (req,res) => {           //예약의 예약 �
         })
         return
     }
+
+    let session2 = database.getSession3(id)
     
     const seatNumber = req.body.seatNumber
-    database.getSeatBySeatNumber(seatNumber)[reserveReserve].append(id)     //seat DB의 reserveReserve키의 벨류값은 리스트
-    session.reserveReserve.append(seatNumber)
+    database.getSeatBySeatNumber(seatNumber)[0].reserveReserve.push(id)     //seat DB의 reserveReserve키의 벨류값은 리스트
+    session2.push(seatNumber)
 
     res.json({
         ok: true,
@@ -434,8 +436,10 @@ app.post('/seats/reserve/reserve/off', (req,res) => {
         })
         return
     }
+    let session2 = database.getSession3(id)
+
     const seatNumber = req.body.seatNumber
-    if(!session.reserveReserve.include(seatNumber)) {
+    if(!session2.includes(seatNumber)) {
         res.json({
             ok: false,
             err: 'No reserve reserve found'
@@ -443,9 +447,9 @@ app.post('/seats/reserve/reserve/off', (req,res) => {
         return
     }
 
-    const index = session.reserveReserve.indexOf(seatNumber);
+    const index = session2.indexOf(seatNumber);
     if (index !== -1) {
-        session.reserveReserve.splice(index, 1);
+        session2.splice(index, 1);
     }
 
     res.json({
