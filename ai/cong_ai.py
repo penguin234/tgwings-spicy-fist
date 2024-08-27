@@ -3,12 +3,13 @@ import pandas as pd
 import math
 from fastapi import FastAPI
 
-columns = ['1f_1_cong', '1f_but_cong', '2f_he_cong', '2f_2_cong']
+columns = ['1f_1', '1f_but', '2f_he', '2f_2', '1f_ele']
 codetoc = {
     8: columns[0],
     10: columns[1],
     11: columns[2],
-    9: columns[3]
+    9: columns[3],
+    12: columns[4]
 }
 
 models = {}
@@ -22,10 +23,11 @@ def load_and_predict(future_data, target_column):
     print('predict function call')
 
     max_seats = {
-    '1f_1_cong': 410,
-    '1f_but_cong': 156,
-    '2f_he_cong': 187,
-    '2f_2_cong': 326
+    columns[0]: 410,
+    columns[1]: 156,
+    columns[2]: 187,
+    columns[3]: 326,
+    columns[4]: 47
     }
 
     future_data['datetime'] = pd.to_datetime(future_data['date'] + ' ' + future_data['time'])
