@@ -8,7 +8,16 @@ import 'dart:convert';
 Future<List<dynamic>> getRooms() async {
   final res = await http.get(Uri.parse('https://libseat.khu.ac.kr/libraries/lib-status/2'));
   final data = jsonDecode(res.body) as Map<String, dynamic>;
-  return data['data'] as List<dynamic>;
+  List<dynamic> ls = data['data'] as List<dynamic>;
+  ls.add({
+    'code': 12,
+    'name': '자대 열람실',
+    'inUse': 0,
+    'cnt': 47,
+    'startTm': '0000',
+    'endTm': '0000'
+  });
+  return ls;
 }
 
 class SeatReservePage extends StatefulWidget {

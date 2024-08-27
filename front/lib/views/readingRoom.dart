@@ -9,6 +9,12 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 Future<List<dynamic>> getSeats(int roomCode) async {
+  if (roomCode == 12) {
+    final res = await http.get(Uri.parse('http://localhost:8080/room/seats'));
+    final data = jsonDecode(res.body) as Map<String, dynamic>;
+    return data['data'] as List<dynamic>;
+  }
+
   final res = await http.get(Uri.parse('https://libseat.khu.ac.kr/libraries/seats/$roomCode'));
   final data = jsonDecode(res.body) as Map<String, dynamic>;
   return data['data'] as List<dynamic>;
@@ -101,7 +107,7 @@ class _ReadingRoomState extends State<ReadingRoom> {
                 child: Container(
                   decoration: BoxDecoration(
                     image: DecorationImage(image: 
-                      AssetImage("rooms/${widget.room['code']}.jpg"),
+                      AssetImage("rooms/${widget.room['code']}.${widget.room['code']==12?'png':'jpg'}"),
                     ),
                   ),
                   child:
@@ -158,6 +164,14 @@ class _ReadingRoomState extends State<ReadingRoom> {
       ypos += 30;
       //width *= 0.8;
       height *= 0.72;
+    }
+
+    if (widget.room['code'] == 12) {
+      // 자대 열람실
+      xpos *= 0.9;
+      width *= 0.9;
+      ypos *= 0.85;
+      height *= 0.85;
     }
 
     return Positioned(
