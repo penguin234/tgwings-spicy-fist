@@ -383,6 +383,16 @@ app.put('/seats/time/add', (req, res) => {                  //시간 연장
 
     const data = database.getSeatById(id)[0]
 
+    const data2 = database.getSeatById(id)
+
+    if (data2.length == 0) {
+        res.status(404).json({
+            ok: false,
+            err: 'No reservation found for the given id'
+        })
+        return
+    }
+
     if (data.addCount == 0) {                       //연장 가능 횟수가 남아있지 않음
         res.status(403).json({
             ok: false,
@@ -390,6 +400,7 @@ app.put('/seats/time/add', (req, res) => {                  //시간 연장
         })
         return
     }
+
     const time = req.body.addTime                   //얼마나 연장할건지
     let newAddCount = data.addCount - 1           //연장 가능 횟수 차감
     database.addTime(data,time,newAddCount)
