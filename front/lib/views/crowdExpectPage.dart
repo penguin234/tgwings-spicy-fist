@@ -16,10 +16,17 @@ Future<List<dynamic>> getRooms(_date, _time) async {
   final res = await http.get(Uri.parse('https://libseat.khu.ac.kr/libraries/lib-status/2'));
   final data = jsonDecode(res.body) as Map<String, dynamic>;
   var ls = data['data'] as List<dynamic>;
-  ls.add(ls[0]);
+
+  ls.add({
+    'code': 12,
+    'name': '자대 열람실',
+    'inUse': 0,
+    'cnt': 47,
+    'startTm': '0000',
+    'endTm': '0000'
+  });
 
   final d1 = await http.get(Uri.parse("http://192.168.1.136:8000/predict/${8}/$pdate/$ptime"));
-  print(jsonDecode(d1.body) as Map<String, dynamic>);
 
   for (int i = 0; i < ls.length; i++) {
     final pd = await http.get(Uri.parse("http://192.168.1.136:8000/predict/${ls[i]['code']}/$pdate/$ptime"));
@@ -73,40 +80,10 @@ class _CrowdExpectPageState extends State<CrowdExpectPage> {
           '예상 혼잡도',
           style: GoogleFonts.robotoCondensed(
             fontWeight: FontWeight.bold,
-            fontSize: 40,
+            fontSize: 30,
           ),
         ),
         centerTitle: true,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      widget.data['name'],
-                      style: GoogleFonts.notoSans(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
-                      ),
-                    ),
-                    SizedBox(height: 5),
-                    Text(
-                      widget.data['id'],
-                      style: GoogleFonts.notoSans(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
       body: Stack(
         alignment: Alignment.center,
@@ -145,12 +122,38 @@ class _CrowdExpectPageState extends State<CrowdExpectPage> {
                         initialDate: DateTime.now(),
                         firstDate: DateTime.now(),
                         lastDate: DateTime(DateTime.now().year + 1, DateTime.now().month, 1),
+                        builder: (BuildContext context, Widget? child) {
+                          return Theme(
+                            data: ThemeData.light().copyWith(
+                              colorScheme: ColorScheme.light(
+                                primary: khblue,
+                                onPrimary: Colors.white,
+                                onSurface: Colors.black,
+                              ),
+                              dialogBackgroundColor: Colors.white,
+                            ),
+                            child: child!,
+                          );
+                        },
                       );
 
                       if (selectedDate != null) {
                         final selectedTime = await showTimePicker(
                           context: context,
                           initialTime: TimeOfDay.now(),
+                          builder: (BuildContext context, Widget? child) {
+                            return Theme(
+                              data: ThemeData.light().copyWith(
+                                colorScheme: ColorScheme.light(
+                                  primary: khblue,
+                                  onPrimary: Colors.white,
+                                  onSurface: Colors.black,
+                                ),
+                                dialogBackgroundColor: Colors.white,
+                              ),
+                              child: child!,
+                            );
+                          },
                         );
 
                         if (selectedTime != null) {
