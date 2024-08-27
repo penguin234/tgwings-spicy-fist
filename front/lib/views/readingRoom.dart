@@ -63,36 +63,6 @@ class _ReadingRoomState extends State<ReadingRoom> {
           ),
         ),
         centerTitle: true,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      widget.data['name'],
-                      style: GoogleFonts.notoSans(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
-                      ),
-                    ),
-                    SizedBox(height: 5),
-                    Text(
-                      widget.data['id'],
-                      style: GoogleFonts.notoSans(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
       body: InteractiveViewer(
         child: InteractiveViewer(
@@ -197,7 +167,7 @@ class _ReadingRoomState extends State<ReadingRoom> {
               seat['name'],
               style: TextStyle(
                 color: isActive ? textColor : inactiveTextColor,
-                fontSize: widget.room['code'] == 12 ? 8 : width / 3,
+                fontSize: widget.room['code'] == 12 ? 4 : width / 3,
               ),
             ),
           ),
