@@ -21,6 +21,7 @@ class BookSeat extends StatelessWidget {
       supportedLocales: [
         const Locale('ko','KR')
       ],
+      debugShowCheckedModeBanner: false,
     );
   }
 }
