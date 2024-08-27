@@ -75,7 +75,7 @@ app.post('/user/login', (req, res) => {
     
 })
 
-app.get('/user/status', (req, res) => {                 // 유저 정보 확인
+app.post('/user/status', (req, res) => {                 // 유저 정보 확인
     const id = req.body.id
     if (!id) {
         res.json({
