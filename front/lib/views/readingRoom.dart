@@ -9,6 +9,12 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 Future<List<dynamic>> getSeats(int roomCode) async {
+  if (roomCode == 12) {
+    final res = await http.get(Uri.parse('http://localhost:8080/room/seats'));
+    final data = jsonDecode(res.body) as Map<String, dynamic>;
+    return data['data'] as List<dynamic>;
+  }
+
   final res = await http.get(Uri.parse('https://libseat.khu.ac.kr/libraries/seats/$roomCode'));
   final data = jsonDecode(res.body) as Map<String, dynamic>;
   return data['data'] as List<dynamic>;
@@ -101,7 +107,7 @@ class _ReadingRoomState extends State<ReadingRoom> {
                 child: Container(
                   decoration: BoxDecoration(
                     image: DecorationImage(image: 
-                      AssetImage("rooms/${widget.room['code']}.jpg"),
+                      AssetImage("rooms/${widget.room['code']}.${widget.room['code']==12?'png':'jpg'}"),
                     ),
                   ),
                   child:
@@ -160,6 +166,14 @@ class _ReadingRoomState extends State<ReadingRoom> {
       height *= 0.72;
     }
 
+    if (widget.room['code'] == 12) {
+      // 자대 열람실
+      xpos *= 0.9;
+      width *= 0.9;
+      ypos *= 0.85;
+      height *= 0.85;
+    }
+
     return Positioned(
       left: xpos,
       top: ypos,
@@ -183,7 +197,7 @@ class _ReadingRoomState extends State<ReadingRoom> {
               seat['name'],
               style: TextStyle(
                 color: isActive ? textColor : inactiveTextColor,
-                fontSize: width / 3,
+                fontSize: widget.room['code'] == 12 ? 8 : width / 3,
               ),
             ),
           ),
@@ -278,8 +292,6 @@ void reserveDialog(BuildContext context, Map<String, dynamic> seat) {
                         flex: 1,
                         child: Column(
                           children: [
-                            InfoBox(title: "사용시간", content: "4시간 이용 가능석"),
-                            SizedBox(height: 8),
                             InfoBox(title: "입실확인", content: "HH:MM까지"),
                             SizedBox(height: 8),
                             InfoBox(title: "배정시간", content: "HH:MM까지"),
@@ -366,7 +378,9 @@ class InfoBox extends StatelessWidget {
           Spacer(),
           Text(
             content,
-            style: GoogleFonts.notoSans(),
+            style: GoogleFonts.notoSans(
+              fontSize: 12,
+            ),
           ),
         ],
       ),
