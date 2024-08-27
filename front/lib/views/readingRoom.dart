@@ -197,7 +197,7 @@ class _ReadingRoomState extends State<ReadingRoom> {
               seat['name'],
               style: TextStyle(
                 color: isActive ? textColor : inactiveTextColor,
-                fontSize: width / 3,
+                fontSize: widget.room['code'] == 12 ? 8 : width / 3,
               ),
             ),
           ),

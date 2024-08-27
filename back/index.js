@@ -402,7 +402,8 @@ app.post('/seats/reserve/reserve/off', (req,res) => {
 app.get('/room/seats', (req, res) => {
     res.json({
         ok: true,
-        data: [{"name":"1","xpos":1389,"ypos":747,"width":45,"height":30,"textSize":12},
+        data: [
+            {"name":"1","xpos":1389,"ypos":747,"width":45,"height":30,"textSize":12},
             {"name":"2","xpos":1293,"ypos":747,"width":45,"height":30,"textSize":12},
             {"name":"3","xpos":1197,"ypos":747,"width":45,"height":30,"textSize":12},
             {"name":"4","xpos":1101,"ypos":747,"width":45,"height":30,"textSize":12},
@@ -439,15 +440,15 @@ app.get('/room/seats', (req, res) => {
             {"name":"35","xpos":1197,"ypos":228,"width":45,"height":30,"textSize":12},
             {"name":"36","xpos":1101,"ypos":228,"width":45,"height":30,"textSize":12},
             {"name":"37","xpos":1005,"ypos":228,"width":45,"height":30,"textSize":12},
-            {"name":"38","xpos":612,"ypos":596,"width":45,"height":30,"textSize":12},
-            {"name":"39","xpos":612,"ypos":503,"width":45,"height":30,"textSize":12},
-            {"name":"40","xpos":612,"ypos":409,"width":45,"height":30,"textSize":12},
-            {"name":"41","xpos":612,"ypos":316,"width":45,"height":30,"textSize":12},
-            {"name":"42","xpos":612,"ypos":223,"width":45,"height":30,"textSize":12},
-            {"name":"43","xpos":754,"ypos":446,"width":45,"height":30,"textSize":12},
-            {"name":"44","xpos":754,"ypos":352,"width":45,"height":30,"textSize":12},
-            {"name":"45","xpos":815,"ypos":446,"width":45,"height":30,"textSize":12},
-            {"name":"46","xpos":815,"ypos":352,"width":45,"height":30,"textSize":12},
+            {"name":"38","xpos":612,"ypos":596,"width":30,"height":45,"textSize":12},
+            {"name":"39","xpos":612,"ypos":503,"width":30,"height":45,"textSize":12},
+            {"name":"40","xpos":612,"ypos":409,"width":30,"height":45,"textSize":12},
+            {"name":"41","xpos":612,"ypos":316,"width":30,"height":45,"textSize":12},
+            {"name":"42","xpos":612,"ypos":223,"width":30,"height":45,"textSize":12},
+            {"name":"43","xpos":754,"ypos":446,"width":30,"height":45,"textSize":12},
+            {"name":"44","xpos":754,"ypos":352,"width":30,"height":45,"textSize":12},
+            {"name":"45","xpos":815,"ypos":446,"width":30,"height":45,"textSize":12},
+            {"name":"46","xpos":815,"ypos":352,"width":30,"height":45,"textSize":12},
             {"name":"47","xpos":769,"ypos":293,"width":45,"height":30,"textSize":12},
         ]
     })
