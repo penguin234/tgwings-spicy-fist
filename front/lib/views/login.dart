@@ -160,6 +160,9 @@ class _MyLoginPageState extends State<MyLoginPage> {
                           if (studentData['ok'] == false) {
                             throw Exception(studentData['err']);
                           }
+
+                          updateStatus(studentData);
+
                           Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (context) => MainPage(studentData),

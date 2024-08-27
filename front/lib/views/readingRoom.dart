@@ -145,8 +145,15 @@ class _ReadingRoomState extends State<ReadingRoom> {
     final Color textColor = Colors.white; // 사용 가능 좌석 텍스트 색
     const Color inactiveColor = Colors.grey; // 사용중 좌석 색
     const Color inactiveTextColor = Colors.white; // 사용중 좌석 텍스트 색
-    final Color selectedColor =Colors.white;
+    final Color mySeatColor =Colors.orange;
     final Color selectedTextColor = Colors.black;
+
+    bool isMySeat = false;
+    if (widget.data['status']['mySeat'] != null) {
+      if (widget.data['status']['mySeat']['seat']['code'] == seat['code']) {
+        isMySeat = true;
+      }
+    }
 
     // for some correcting positions
     if (widget.room['code'] == 11) {
@@ -189,7 +196,7 @@ class _ReadingRoomState extends State<ReadingRoom> {
         },
         child: Container(
           decoration: BoxDecoration(
-            color: isActive ? boxColor : inactiveColor,
+            color: !isMySeat ? isActive ? boxColor : inactiveColor : mySeatColor,
           ),
           width: width - 0.5,
           height: height - 0.5,
@@ -336,8 +343,8 @@ void reserveDialog(BuildContext context, Map<String, dynamic> userData, Map<Stri
                             if (!data['ok']) {
                               showSnackbar(context, data['err']);
                             }
+                            updateStatus(userData);
 
-                            // 좌석 배정 로직 추가
                             Navigator.of(context).pop();
                           },
                           child: Text(
