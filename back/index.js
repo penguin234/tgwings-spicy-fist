@@ -300,7 +300,7 @@ app.put('/user/reserve', (req,res) => {                 //자리 예약, 예약x
     const id = req.body.id
     const sessionRecv = req.body.session
     const session = database.getSession(id)
-    if (!CheckSession(sessionRecv, session) && session) {
+    if (!session || !CheckSession(sessionRecv, session)) {
         res.status(401).json({
             ok: false,
             err: 'incorrect Session'
@@ -337,7 +337,7 @@ app.put('/user/reserve/off', (req, res) => {                //자리 예약, 예
     const sessionRecv = req.body.session
     const session = database.getSession(id)
 
-    if (!CheckSession(sessionRecv, session) && session) {
+    if (!session || !CheckSession(sessionRecv, session)) {
         res.status(401).json({
             ok: false,
             err: 'incorrect Session'
@@ -370,7 +370,7 @@ app.put('/seats/time/add', (req, res) => {                  //시간 연장
     const sessionRecv = req.body.session
     const session = database.getSession(id)
 
-    if (!CheckSession(sessionRecv, session) && session) {
+    if (!session || !CheckSession(sessionRecv, session)) {
         res.status(401).json({
             ok: false,
             err: 'incorrect Session'
@@ -403,17 +403,19 @@ app.post('/seats/reserve/reserve', (req,res) => {           //예약의 예약 �
     const sessionRecv = req.body.session
     const session = database.getSession(id)
 
-    if (!CheckSession(sessionRecv, session) && session) {
+    if (!session || !CheckSession(sessionRecv, session)) {
         res.status(401).json({
             ok: false,
             err: 'incorrect Session'
         })
         return
     }
+
+    let session2 = database.getSession3(id)
     
     const seatNumber = req.body.seatNumber
-    database.getSeatBySeatNumber(seatNumber)[reserveReserve].append(id)     //seat DB의 reserveReserve키의 벨류값은 리스트
-    session.reserveReserve.append(seatNumber)
+    database.getSeatBySeatNumber(seatNumber)[0].reserveReserve.push(id)     //seat DB의 reserveReserve키의 벨류값은 리스트
+    session2.push(seatNumber)
 
     res.json({
         ok: true,
@@ -427,15 +429,17 @@ app.post('/seats/reserve/reserve/off', (req,res) => {
     const sessionRecv = req.body.session
     const session = database.getSession(id)
 
-    if (!CheckSession(sessionRecv, session) && session) {
+    if (!session || !CheckSession(sessionRecv, session)) {
         res.status(401).json({
             ok: false,
             err: 'incorrect Session'
         })
         return
     }
+    let session2 = database.getSession3(id)
+
     const seatNumber = req.body.seatNumber
-    if(!session.reserveReserve.include(seatNumber)) {
+    if(!session2.includes(seatNumber)) {
         res.json({
             ok: false,
             err: 'No reserve reserve found'
@@ -443,9 +447,9 @@ app.post('/seats/reserve/reserve/off', (req,res) => {
         return
     }
 
-    const index = session.reserveReserve.indexOf(seatNumber);
+    const index = session2.indexOf(seatNumber);
     if (index !== -1) {
-        session.reserveReserve.splice(index, 1);
+        session2.splice(index, 1);
     }
 
     res.json({
