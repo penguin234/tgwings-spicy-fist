@@ -88,7 +88,7 @@ app.get('/user/status', (req, res) => {                 // 유저 정보 확인
     const sessionRecv = req.body.session
     const session = database.getSession(id)
 
-    if (!CheckSession(sessionRecv, session) && session) {
+    if (!session || !CheckSession(sessionRecv, session)) {
         res.status(401).json({
             ok: false,
             err: 'incorrect Session'
@@ -122,7 +122,7 @@ app.post('/user/seat/exit', (req, res) => {
     const sessionRecv = req.body.session
     const session = database.getSession(id)
 
-    if (!CheckSession(sessionRecv, session) && session) {
+    if (!session || !CheckSession(sessionRecv, session)) {
         res.status(401).json({
             ok: false,
             err: 'incorrect Session'
@@ -170,6 +170,63 @@ app.post('/user/seat/exit', (req, res) => {
     })
 })
 
+app.post('/user/seat/use', (req, res) => {
+    const id = req.body.id
+    if (!id) {
+        res.json({
+            ok: false,
+            err: 'id is required'
+        })
+        return
+    }
+
+    const sessionRecv = req.body.session
+    const session = database.getSession(id)
+
+    if (!session || !CheckSession(sessionRecv, session)) {
+        res.status(401).json({
+            ok: false,
+            err: 'incorrect Session'
+        })
+        return
+    }
+
+    request.post({
+        uri: 'https://libseat.khu.ac.kr/libraries/seat',
+        body: {
+            "seatId": req.body.code,
+            "time": req.body.time
+        },
+        headers: {
+            'User-Agent': 'request',
+            Cookie: database.getSession2(req.body.id)
+        },
+        json: true
+    }, (err, result, body) => {
+        if (err) {
+            console.log('lib login err', err)
+            res.status(400).json({
+                ok: false,
+                err: err
+            })
+            return
+        }
+
+        console.log(body)
+        if (body['code'] != 1) {
+            res.status(400).json({
+                ok: false,
+                err: body['message']
+            })
+            return
+        }
+
+        res.json({
+            ok: true
+        })
+    })
+})
+
 app.post('/user/qr', (req,res) => {                     //qr코드 발급
     const id = req.body.id
     if (!id) {
@@ -182,7 +239,7 @@ app.post('/user/qr', (req,res) => {                     //qr코드 발급
 
     const sessionRecv = req.body.session
     const session = database.getSession(id)
-    if (!CheckSession(sessionRecv, session) && session) {
+    if (!session || !CheckSession(sessionRecv, session)) {
         res.status(401).json({
             ok: false,
             err: 'incorrect Session'
@@ -217,7 +274,7 @@ app.get('/user/seat', (req, res) => {                   //예약한 자리 정�
 
     const sessionRecv = req.body.session
     const session = database.getSession(id)
-    if (!CheckSession(sessionRecv, session) && session) {
+    if (!session || !CheckSession(sessionRecv, session)) {
         res.status(401).json({
             ok: false,
             err: 'incorrect Session'

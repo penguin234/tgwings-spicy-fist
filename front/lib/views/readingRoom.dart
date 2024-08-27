@@ -4,6 +4,7 @@ import 'package:tgthon/views/QRpage.dart';
 import 'package:tgthon/views/crowdExpectPage.dart';
 import 'package:tgthon/views/myPage.dart';
 import 'package:tgthon/views/seatReservePage.dart';
+import './utils.dart';
 import '../theme.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -180,7 +181,7 @@ class _ReadingRoomState extends State<ReadingRoom> {
       child: GestureDetector(
         onTap: () {
           if (isActive) {
-            reserveDialog(context, seat);
+            reserveDialog(context, widget.data, seat);
           }
           else {
             alarmDialog(context, seat);
@@ -207,9 +208,10 @@ class _ReadingRoomState extends State<ReadingRoom> {
   }
 }
 
-void reserveDialog(BuildContext context, Map<String, dynamic> seat) {
+void reserveDialog(BuildContext context, Map<String, dynamic> userData, Map<String, dynamic> seat) {
   int selectedHour = 1; // Default value
   int selectedMinute = 0; // Default value
+  List<int> ableMinute = [0, 30];
 
   showDialog(
     context: context,
@@ -252,6 +254,13 @@ void reserveDialog(BuildContext context, Map<String, dynamic> seat) {
                                   onChanged: (int? newValue) {
                                     setState(() {
                                       selectedHour = newValue!;
+                                      if (selectedHour == 4) {
+                                        ableMinute = [0];
+                                        selectedMinute = 0;
+                                      }
+                                      else {
+                                        ableMinute = [0, 30];
+                                      }
                                     });
                                   },
                                   items: [1, 2, 3, 4].map<DropdownMenuItem<int>>((int value) {
@@ -272,7 +281,7 @@ void reserveDialog(BuildContext context, Map<String, dynamic> seat) {
                                       selectedMinute = newValue!;
                                     });
                                   },
-                                  items: [0, 30].map<DropdownMenuItem<int>>((int value) {
+                                  items: ableMinute.map<DropdownMenuItem<int>>((int value) {
                                     return DropdownMenuItem<int>(
                                       value: value,
                                       child: Text(value.toString().padLeft(2, '0')),
@@ -292,9 +301,9 @@ void reserveDialog(BuildContext context, Map<String, dynamic> seat) {
                         flex: 1,
                         child: Column(
                           children: [
-                            InfoBox(title: "입실확인", content: "HH:MM까지"),
+                            InfoBox(title: "입실확인", content: "${formatHHMM(DateTime.now().hour, DateTime.now().minute, 30)}까지"),
                             SizedBox(height: 8),
-                            InfoBox(title: "배정시간", content: "HH:MM까지"),
+                            InfoBox(title: "배정시간", content: "${formatHHMM(DateTime.now().hour, DateTime.now().minute, selectedHour * 60 + selectedMinute)}까지"),
                           ],
                         ),
                       ),
@@ -309,7 +318,25 @@ void reserveDialog(BuildContext context, Map<String, dynamic> seat) {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: khblue,
                           ),
-                          onPressed: () {
+                          onPressed: () async {
+                            final res = await http.post(
+                                Uri.parse('http://localhost:8080/user/seat/use'),
+                                headers: <String, String>{
+                                  'Content-Type': 'application/json'
+                                },
+                                body: jsonEncode(<String, dynamic>{
+                                  'id': userData['id'],
+                                  'session': userData['cookie'][0],
+                                  'code': seat['code'],
+                                  'time': selectedHour * 60 + selectedMinute
+                                })
+                            );
+
+                            final data = jsonDecode(res.body) as Map<String, dynamic>;
+                            if (!data['ok']) {
+                              showSnackbar(context, data['err']);
+                            }
+
                             // 좌석 배정 로직 추가
                             Navigator.of(context).pop();
                           },

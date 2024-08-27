@@ -6,13 +6,14 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
 
-Future<Map<String, dynamic>> getQR(String sid) async {
+Future<Map<String, dynamic>> getQR(Map<String, dynamic> data) async {
   final res = await http.post(Uri.parse('http://localhost:8080/user/qr'), //uri는 나중에 통신할 때 입력
       headers: <String, String>{
         'Content-Type': 'application/json'
       },
       body: jsonEncode(<String, String>{
-        'id': sid,
+        'id': data['id'],
+        'session': data['cookie'][0],
       }));
   return jsonDecode(res.body) as Map<String, dynamic>;
 }
@@ -81,9 +82,12 @@ class _QRpageState extends State<QRpage> {
                 ),
               ),
               FutureBuilder<Map<String, dynamic>>(
-                future: getQR(widget.data['id']),
+                future: getQR(widget.data),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
+                    if (!snapshot.data!['ok']) {
+                      return Text('오류 ${snapshot.data!['err']}');
+                    }
                     return ofQR(snapshot.data!['QR']);
                   }
                   return Text('로딩중');
