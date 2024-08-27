@@ -309,12 +309,15 @@ app.put('/user/reserve', (req,res) => {                 //자리 예약, 예약x
     }
 
     if(database.getSeatById(id).length != 0) {      //이미 예약한 자리 존재
-        res.status(400)
+        res.status(400).json({
+            ok: false,
+            err: 'already reserved seat'
+        })
         return
     }
     else {
         const seatNumber = req.body.seatNumber
-        if(database.getSeatBySeatNumber(seatNumber).reservedTime != null) {   //다른 사람이 예약중인 좌석
+        if(database.getSeatBySeatNumber(seatNumber)[0].reservedTime != null) {   //다른 사람이 예약중인 좌석
             res.json({
                 ok: false,
                 err: 'already reserved seat'
@@ -378,7 +381,7 @@ app.put('/seats/time/add', (req, res) => {                  //시간 연장
         return
     }
 
-    const data = database.getSeatById(id)
+    const data = database.getSeatById(id)[0]
 
     if (data.addCount == 0) {                       //연장 가능 횟수가 남아있지 않음
         res.status(403).json({
@@ -412,8 +415,15 @@ app.post('/seats/reserve/reserve', (req,res) => {           //예약의 예약 �
     }
 
     let session2 = database.getSession3(id)
-    
     const seatNumber = req.body.seatNumber
+
+    if (session2.includes(seatNumber)) {
+        res.json({
+            ok: false,
+            err: 'already reserved reserve'
+        })
+        return
+    }
     database.getSeatBySeatNumber(seatNumber)[0].reserveReserve.push(id)     //seat DB의 reserveReserve키의 벨류값은 리스트
     session2.push(seatNumber)
 
@@ -455,6 +465,28 @@ app.post('/seats/reserve/reserve/off', (req,res) => {
     res.json({
         ok: true,
         message: 'delete reserve reserve successfully'
+    })
+})
+
+app.get('/seats/reserve/reserve/my', (req,res) => {             // my reserve reserve
+    const id = req.body.id
+
+    const sessionRecv = req.body.session
+    const session = database.getSession(id)
+
+    if (!session || !CheckSession(sessionRecv, session)) {
+        res.status(401).json({
+            ok: false,
+            err: 'incorrect Session'
+        })
+        return
+    }
+    
+    const session2 = database.getSession3(id)
+    
+    res.json({
+        ok: true,
+        data: session2
     })
 })
 

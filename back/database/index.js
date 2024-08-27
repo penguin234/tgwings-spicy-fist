@@ -39,7 +39,7 @@ const getSession2 = function(id) {
     return session.find(user => user.id == id)['Cookie2'];
 }
 const getSession3= function(id) {
-    return session.find(user => user,id == id)['reserveReserve'];
+    return session.find(user => user.id == id)['reserveReserve'];
 }
 
 
@@ -73,7 +73,7 @@ const getSeatById = function(id) {
 };
 
 const addTime = function(seat,time,newAddCount) {
-    seat.time += time
+    seat.time = String(parseInt(seat.time) + parseInt(time))
     seat.addCount = newAddCount
 };
 const { DateTime } = require('luxon'); // Using luxon for date/time handling
@@ -83,6 +83,10 @@ const checkAndResetSeats = () => {
         if (seat.reservedTime) {
             const reservationEnd = DateTime.fromISO(seat.reservedTime).plus({ minutes: seat.time });
             const now = DateTime.now();
+
+            if (30000 <= reservationEnd - now && reservationEnd - now < 31000) {            // Before 30 minutes
+                console.log("Before 30 minutes");                                           // 1800000 over 1860000 under
+            }
 
             if (now >= reservationEnd) {
                 console.log(`Resetting seat ${seat.seatNumber} as its reservation has expired.`);
@@ -95,7 +99,7 @@ const checkAndResetSeats = () => {
 };
 
 // Run the check every minute
-setInterval(checkAndResetSeats, 60000); // 60000 ms = 1 minute
+setInterval(checkAndResetSeats, 10000); // 60000 ms = 1 minute
 
 
 
