@@ -300,7 +300,7 @@ app.put('/user/reserve', (req,res) => {                 //자리 예약, 예약x
     const id = req.body.id
     const sessionRecv = req.body.session
     const session = database.getSession(id)
-    if (!CheckSession(sessionRecv, session) && session) {
+    if (!session || !CheckSession(sessionRecv, session)) {
         res.status(401).json({
             ok: false,
             err: 'incorrect Session'
@@ -337,7 +337,7 @@ app.put('/user/reserve/off', (req, res) => {                //자리 예약, 예
     const sessionRecv = req.body.session
     const session = database.getSession(id)
 
-    if (!CheckSession(sessionRecv, session) && session) {
+    if (!session || !CheckSession(sessionRecv, session)) {
         res.status(401).json({
             ok: false,
             err: 'incorrect Session'
@@ -370,7 +370,7 @@ app.put('/seats/time/add', (req, res) => {                  //시간 연장
     const sessionRecv = req.body.session
     const session = database.getSession(id)
 
-    if (!CheckSession(sessionRecv, session) && session) {
+    if (!session || !CheckSession(sessionRecv, session)) {
         res.status(401).json({
             ok: false,
             err: 'incorrect Session'
@@ -403,7 +403,7 @@ app.post('/seats/reserve/reserve', (req,res) => {           //예약의 예약 �
     const sessionRecv = req.body.session
     const session = database.getSession(id)
 
-    if (!CheckSession(sessionRecv, session) && session) {
+    if (!session || !CheckSession(sessionRecv, session)) {
         res.status(401).json({
             ok: false,
             err: 'incorrect Session'
@@ -427,7 +427,7 @@ app.post('/seats/reserve/reserve/off', (req,res) => {
     const sessionRecv = req.body.session
     const session = database.getSession(id)
 
-    if (!CheckSession(sessionRecv, session) && session) {
+    if (!session || !CheckSession(sessionRecv, session)) {
         res.status(401).json({
             ok: false,
             err: 'incorrect Session'
