@@ -2,6 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme.dart';
 import 'readingRoom.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+Future<List<dynamic>> getRooms() async {
+  final res = await http.get(Uri.parse('https://libseat.khu.ac.kr/libraries/lib-status/2'));
+  final data = jsonDecode(res.body) as Map<String, dynamic>;
+  List<dynamic> ls = data['data'] as List<dynamic>;
+  ls.add({
+    'code': 12,
+    'name': '자대 열람실',
+    'inUse': 0,
+    'cnt': 47,
+    'startTm': '0000',
+    'endTm': '0000'
+  });
+  return ls;
+}
 
 class SeatReservePage extends StatefulWidget {
   final Map<String, dynamic> data;
@@ -19,16 +36,13 @@ class _SeatReservePageState extends State<SeatReservePage> {
     super.dispose();
   }
 
+  String formatTime(String start, String end) {
+    if (end == "0000") end = "2400";
+    return "${start.substring(0, 2)}:${start.substring(2, 4)}-${end.substring(0, 2)}:${end.substring(2, 4)}";
+  }
+
   @override
   Widget build(BuildContext context) {
-    final List<Map<String, String>> readingRooms = [
-      {"name": "1F 제1열람실", "time": "00:00~24:00"},
-      {"name": "1F 벗터", "time": "06:00~24:00"},
-      {"name": "2F 혜윰", "time": "09:00~17:30"},
-      {"name": "2F 제2열람실", "time": "00:00~24:00"},
-      {"name": "전정대 1F 열람실", "time": "00:00~24:00"},
-    ];
-
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -63,87 +77,115 @@ class _SeatReservePageState extends State<SeatReservePage> {
               ),
             ),
           ),
-          Column(
-            children: [
-              SizedBox(height: 50),
-              ...readingRooms.map((room) {
-                return Flexible(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 15.0),
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => ReadingRoom(widget.data),
-                          ),
-                        );
-                      },
-                      child: Card(
-                        color: Colors.white,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    SizedBox(height: 20),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          room["name"]!,
-                                          style: GoogleFonts.notoSans(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 18,
-                                          ),
-                                        ),
-                                        SizedBox(width: 5),
-                                        Text(
-                                          room["time"]!,
-                                          style: GoogleFonts.notoSans(
-                                            fontSize: 12,
-                                            color: Colors.grey[600],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 5),
-                                    Text(
-                                      "이용 가능 좌석수 / 전체 좌석수",
-                                      style: GoogleFonts.notoSans(
-                                        fontSize: 14,
-                                        color: Colors.black54,
-                                      ),
-                                    ),
-                                    SizedBox(height: 20),
-                                  ],
-                                ),
+          FutureBuilder<List<dynamic>>(future: getRooms(), builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return Column(
+                children: [
+                  SizedBox(height: 50),
+                  ...snapshot.data!.map(fromRoom).toList(),
+                  SizedBox(height: 50),
+                ],
+              );
+            }
+            return Text("Loading...");
+          }),
+        ],
+      ),
+    );
+  }
+
+  Widget fromRoom(dynamic roomData) {
+    final room = roomData as Map<String, dynamic>;
+    return Flexible(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 15.0),
+        child: InkWell(
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => ReadingRoom(widget.data, room),
+              ),
+            );
+          },
+          child: Card(
+            color: Colors.white,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Text(
+                              room["name"]!,
+                              style: GoogleFonts.notoSans(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
                               ),
-                              SizedBox(width: 16),
-                              Container(
-                                width: 100,
-                                height: 10,
-                                child: LinearProgressIndicator(
-                                  value: 0.5, // 이용율은 나중에 API로 받아서 처리
-                                  backgroundColor: Colors.grey[300],
-                                  valueColor: AlwaysStoppedAnimation<Color>(khblue),
-                                ),
+                            ),
+                            SizedBox(width: 5),
+                            Text(
+                              formatTime(room["startTm"], room["endTm"]),
+                              style: GoogleFonts.notoSans(
+                                fontSize: 12,
+                                color: Colors.grey[600],
                               ),
-                            ],
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 5),
+                        Text(
+                          (room["cnt"] - room["inUse"]).toString() + " / " + room["cnt"].toString() + " 이용 가능",
+                          style: GoogleFonts.notoSans(
+                            fontSize: 14,
+                            color: Colors.black54,
                           ),
                         ),
-                      ),
+                        SizedBox(height: 20),
+                      ],
                     ),
                   ),
-                );
-              }).toList(),
-              SizedBox(height: 50),
-            ],
+                  SizedBox(width: 16),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "이걸 찾아?",
+                        style: GoogleFonts.notoSans(
+                          fontSize: 14,
+                          color: Colors.transparent
+                        ),
+                      ),
+                      Container(
+                      width: 100,
+                      height: 10,
+                      child: LinearProgressIndicator(
+                        value: room["inUse"] / room["cnt"],
+                        backgroundColor: Colors.grey[300],
+                        valueColor: AlwaysStoppedAnimation<Color>(khblue),
+                      ),
+                    ),
+                      SizedBox(height: 8),
+                      Text(
+                        room["inUse"].toString() + " 이용 중",
+                        style: GoogleFonts.notoSans(
+                          fontSize: 14,
+                          color: Colors.black54,
+                        ),
+                      )
+                    ],
+                  ),
+                ],
+              ),
+            ),
           ),
-        ],
+        ),
       ),
     );
   }

@@ -1,23 +1,33 @@
 import joblib
 import pandas as pd
 import math
-import numpy as np
+from fastapi import FastAPI
 
 columns = ['1f_1', '1f_but', '2f_he', '2f_2', '1f_ele']
+codetoc = {
+    8: columns[0],
+    10: columns[1],
+    11: columns[2],
+    9: columns[3],
+    12: columns[4]
+}
 
 models = {}
 for column in columns:
     model_filename = "ai/pkl/" + f"{column}_model.pkl"
     model = joblib.load(model_filename)
     models[column] = model
+print('model loaded')
 
 def load_and_predict(future_data, target_column):
+    print('predict function call')
+
     max_seats = {
-    '1f_1': 410,
-    '1f_but': 156,
-    '2f_he': 187,
-    '2f_2': 326,
-    '1f_ele' : 47
+    columns[0]: 410,
+    columns[1]: 156,
+    columns[2]: 187,
+    columns[3]: 326,
+    columns[4]: 47
     }
 
     future_data['datetime'] = pd.to_datetime(future_data['date'] + ' ' + future_data['time'])
@@ -35,6 +45,8 @@ def load_and_predict(future_data, target_column):
     max_seat = max_seats[target_column]
     congestion_rate = (predicted_seats / max_seat) * 100
 
+    return predicted_seats
+
     print(f"Loaded model for {target_column} predicts: {predicted_seats} seats")
     print(f"Congestion rate: {congestion_rate:.2f}%")
 
@@ -49,10 +61,19 @@ future_data2 = pd.DataFrame({
     'time': ['12:30'],
 })
 
-print("\nLoading models and making predictions:")
+app = FastAPI()
+print('app made')
 
-for target_column in ['1f_1', '1f_but', '2f_he', '2f_2', '1f_ele']:
-    load_and_predict(future_data1, target_column)
-
-for target_column in ['1f_1', '1f_but', '2f_he', '2f_2', '1f_ele']:
-    load_and_predict(future_data2, target_column)
+# date: YYYYDDMM
+@app.get("/predict/{room}/{date}/{time}")
+async def predict(room, date, time):
+    year = int(date[0:4])
+    month = int(date[4:6])
+    day = int(date[6:8])
+    target = pd.DataFrame({
+        'date': [str(day) + '/' + str(month) + '/' + str(year)],
+        'time': [time]
+    })
+    return {
+        'predict': load_and_predict(target, codetoc[int(room)])
+    }

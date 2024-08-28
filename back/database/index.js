@@ -1,6 +1,6 @@
 //databse seat: made by 김성민 v.2024-08-15 
 let seats = [];
-const totalSeats=20;//자대 열람실 자리 수
+const totalSeats=47;//자대 열람실 자리 수
     for (let i = 1; i <= totalSeats; i++) {
         seats.push({
             seatNumber: i,
@@ -18,15 +18,28 @@ const setSession = function(id,cookie) {
     if (!sessionAvaliable) {
     session.push({
         id: id,
-        Cookie: cookie
+        Cookie: cookie,
+        reserveReserve: []
     });}
     else {
         sessionAvaliable.Cookie = cookie;
     }
 }
+const setSession2 = function(id, cookie) {
+    const sessionAvaliable = session.find(user => user.id === id);
+    if (sessionAvaliable) {
+        sessionAvaliable.Cookie2 = cookie
+    }
+}
 
 const getSession = function(id) {
     return session.find(user => user.id == id)['Cookie'];
+}
+const getSession2 = function(id) {
+    return session.find(user => user.id == id)['Cookie2'];
+}
+const getSession3= function(id) {
+    return session.find(user => user.id == id)['reserveReserve'];
 }
 
 
@@ -42,13 +55,11 @@ const reserveSeat = function(seatNumber, id, reservedTime, time) {
 };
 
 const deleteSeat = function(seat) {
-    console.log('Before deletion:', JSON.stringify(seat, null, 2));
-    if (seat&&seat.id!==null) {
-        seat.id = null;
-        seat.reservedTime = null;
-        seat.time = null;
-        seat.addCount=3;
-        console.log('After deletion:', JSON.stringify(seat, null, 2));
+    if (seat&&seat[0].id!==null) {
+        seat[0].id= null;
+        seat[0].reservedTime = null;
+        seat[0].time = null;
+        seat[0].addCount = 3;
     } else {
         console.log('Unavailable delete');
     }
@@ -62,7 +73,7 @@ const getSeatById = function(id) {
 };
 
 const addTime = function(seat,time,newAddCount) {
-    seat.time += time
+    seat.time = String(parseInt(seat.time) + parseInt(time))
     seat.addCount = newAddCount
 };
 const { DateTime } = require('luxon'); // Using luxon for date/time handling
@@ -73,17 +84,22 @@ const checkAndResetSeats = () => {
             const reservationEnd = DateTime.fromISO(seat.reservedTime).plus({ minutes: seat.time });
             const now = DateTime.now();
 
+            if (1800000 <= reservationEnd - now && reservationEnd - now < 1810000) {            // Before 30 minutes
+                console.log("Before 30 minutes");                                           // 1800000 over 1860000 under if interval is 1 minute
+            }//test: 30000 over 40000 under if interval is 10 second
+
             if (now >= reservationEnd) {
                 console.log(`Resetting seat ${seat.seatNumber} as its reservation has expired.`);
-                deleteSeat(seat);
+                seatArray=[];
+                seatArray.push(seat);
+                deleteSeat(seatArray);
             }
         }
     });
 };
 
 // Run the check every minute
-//setInterval(checkAndResetSeats, 60000); // 60000 ms = 1 minute
-
+setInterval(checkAndResetSeats, 10000); // 60000 ms = 1 minute
 
 
 //database Qr: made by 황재현 v.2024-07-25
@@ -211,6 +227,24 @@ function getQR(mid, cookie, callback, ecallback) {
     })
 }
 
+function getUserInfo(cookie, callback, ecallback) {
+    request.get({
+        url: 'https://libseat.khu.ac.kr/user/my-status',
+        headers: {
+            'User-Agent': 'request',
+            Cookie: cookie
+        }
+    }, function(err, res, body) {
+        if (err) {
+            console.log('err at getUserInfo', err)
+            ecallback(err)
+            return
+        }
+
+        callback(JSON.parse(body))
+    })
+}
+
 module.exports = {
-    seats, reserveSeat, deleteSeat, getSeatBySeatNumber, getSeatById, addTime, getQR, login,getMID, setSession, getSession
+    seats, reserveSeat, deleteSeat, getSeatBySeatNumber, getSeatById, addTime, getQR, login,getMID, setSession, getSession, setSession2, getSession2, getUserInfo, getSession3
 };
