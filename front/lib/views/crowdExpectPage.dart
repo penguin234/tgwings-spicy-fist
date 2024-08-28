@@ -78,7 +78,7 @@ class _CrowdExpectPageState extends State<CrowdExpectPage> {
         backgroundColor: Colors.white,
         title: Text(
           '예상 혼잡도',
-          style: GoogleFonts.robotoCondensed(
+          style: GoogleFonts.notoSans(
             fontWeight: FontWeight.bold,
             fontSize: 30,
           ),

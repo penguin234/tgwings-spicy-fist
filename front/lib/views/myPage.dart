@@ -17,15 +17,11 @@ class MyPage extends StatefulWidget {
 
 class _MyPageState extends State<MyPage> {
   List<Map<String, dynamic>> seats = [
-    {'room': '자대 열람실', 'name': 30, 'code': 1234},
-    {'room': '1 열람실', 'name': 102, 'code': 1235},
-    {'room': '벗터', 'name': 67, 'code': 1236},
-    {'room': '2 열람실', 'name': 123, 'code': 1237},
-    {'room': '1 열람실', 'name': 245, 'code': 1238},
-    {'room': '벗터', 'name': 167, 'code': 1239},
-    {'room': '2 열람실', 'name': 35, 'code': 1240},
-    {'room': '2 열람실', 'name': 22, 'code': 1241},
-    {'room': '1 열람실', 'name': 11, 'code': 1242},
+    {'room': '전자정보대학 열람실', 'name': '12'},
+    {'room': '벗터', 'name': '34'},
+    {'room': '제 2 열람실', 'name': '56'},
+    {'room': '제 1 열람실', 'name': '78'},
+    {'room': '벗터', 'name': '109'},
   ];
 
   List<bool> selectedSeats = [];
@@ -52,335 +48,314 @@ class _MyPageState extends State<MyPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.white,
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back,
-            color: khblue,
+            color: Colors.black,
             size: 30.0,
           ),
           onPressed: () {
             Navigator.of(context).pop();
           },
         ),
-        backgroundColor: Colors.white,
         title: Text(
           '내 정보',
-          style: GoogleFonts.robotoCondensed(
+          style: GoogleFonts.notoSans(
             fontWeight: FontWeight.bold,
+            color: Colors.black,
             fontSize: 30,
-            color: khblue,
           ),
         ),
         centerTitle: true,
-      ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Divider(
-            color: khblue,
-            thickness: 2.0,
-            height: 2.0,
-          ),
-          Container(
-            width: double.infinity,
-            color: Colors.grey,
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              "좌석 배정내역 상세정보",
-              textAlign: TextAlign.center,
-              style: GoogleFonts.notoSans(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-                color: Colors.white,
-              ),
-            ),
-          ),
-          Divider(
-            color: khblue,
-            thickness: 2.0,
-            height: 2.0,
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10.0),
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 5.0,
-                  spreadRadius: 1.0,
-                ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                RichText(
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                        text: "사용자명: ",
-                        style: GoogleFonts.notoSans(
-                          fontWeight: FontWeight.bold,
-                          color: khred,
-                          fontSize: 16,
-                        ),
-                      ),
-                      TextSpan(
-                        text: widget.data['name'],
-                        style: GoogleFonts.notoSans(
-                          fontSize: 16,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                RichText(
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                        text: "좌석정보: ",
-                        style: GoogleFonts.notoSans(
-                          fontWeight: FontWeight.bold,
-                          color: khred,
-                          fontSize: 16,
-                        ),
-                      ),
-                      TextSpan(
-                        text: "국제캠퍼스/열람실 이름/좌석번호",
-                        style: GoogleFonts.notoSans(
-                          fontSize: 16,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                RichText(
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                        text: "배정시간: ",
-                        style: GoogleFonts.notoSans(
-                          fontWeight: FontWeight.bold,
-                          color: khred,
-                          fontSize: 16,
-                        ),
-                      ),
-                      TextSpan(
-                        text: "YYYY.MM.DD HH:MM",
-                        style: GoogleFonts.notoSans(
-                          fontSize: 16,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                RichText(
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                        text: "종료시간: ",
-                        style: GoogleFonts.notoSans(
-                          fontWeight: FontWeight.bold,
-                          color: khred,
-                          fontSize: 16,
-                        ),
-                      ),
-                      TextSpan(
-                        text: "YYYY.MM.DD HH:MM",
-                        style: GoogleFonts.notoSans(
-                          fontSize: 16,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                RichText(
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                        text: "연장시간: ",
-                        style: GoogleFonts.notoSans(
-                          fontWeight: FontWeight.bold,
-                          color: khred,
-                          fontSize: 16,
-                        ),
-                      ),
-                      TextSpan(
-                        text: "HH:MM~",
-                        style: GoogleFonts.notoSans(
-                          fontSize: 16,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                RichText(
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                        text: "입실처리상태: ",
-                        style: GoogleFonts.notoSans(
-                          fontWeight: FontWeight.bold,
-                          color: khred,
-                          fontSize: 16,
-                        ),
-                      ),
-                      TextSpan(
-                        text: "확인 or 미확인",
-                        style: GoogleFonts.notoSans(
-                          fontSize: 16,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: khblue,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                      ),
-                      child: Text("퇴실"),
-                    ),
-                    SizedBox(width: 10),
-                    ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: khblue,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                      ),
-                      child: Text("연장"),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          Divider(
-            color: khblue,
-            thickness: 2.0,
-            height: 2.0,
-          ),
-          Container(
-            width: double.infinity,
-            color: Colors.grey,
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              "퇴실 알림 정보",
-              textAlign: TextAlign.center,
-              style: GoogleFonts.notoSans(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-                color: Colors.white,
-              ),
-            ),
-          ),
-          Divider(
-            color: khblue,
-            thickness: 2.0,
-            height: 2.0,
-          ),
-          Expanded(
-            child: Container(
-              color: Colors.white,
-              padding: const EdgeInsets.all(8.0),
-              child: GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 10.0,
-                  crossAxisSpacing: 10.0,
-                  childAspectRatio: 2.5,
-                ),
-                itemCount: seats.length,
-                itemBuilder: (context, index) {
-                  return Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(color: khblue),
-                      borderRadius: BorderRadius.circular(10.0),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black26,
-                          blurRadius: 8.0,
-                          offset: Offset(4, 4),
-                        ),
-                      ],
-                    ),
-                    child: Stack(
-                      children: [
-                        Center(
-                          child: Text(
-                            "${seats[index]['room']}/${seats[index]['name']}",
-                            style: GoogleFonts.notoSans(
-                              fontSize: 16,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          top: 8,
-                          right: 8,
-                          child: Checkbox(
-                            value: selectedSeats[index],
-                            onChanged: (bool? value) {
-                              setState(() {
-                                selectedSeats[index] = value!;
-                              });
-                            },
-                            activeColor: khred,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
-          Container(
-            color: Colors.white,
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Container(
-                color: Colors.white,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    ElevatedButton(
-                      onPressed: deleteSelectedSeats,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: khred,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                      ),
-                      child: Text("선택 삭제"),
-                    ),
-                  ],
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 10.0),
+            child: TextButton(
+              onPressed: () {},
+              child: Text(
+                'LOGOUT',
+                style: GoogleFonts.notoSans(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
           ),
         ],
+      ),
+      body: Container(
+        decoration: BoxDecoration(
+          color: khred,
+          image: DecorationImage(
+            image: AssetImage('assets/lion.png'),
+            fit: BoxFit.contain,
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 32.0),
+              child: Container(
+                padding: const EdgeInsets.all(16.0),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 6.0,
+                      offset: Offset(2, 2),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${widget.data['name']}',
+                      style: GoogleFonts.notoSans(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      '${widget.data['id']}',
+                      style: GoogleFonts.notoSans(
+                        fontSize: 16,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            // 좌석 배정 내역 섹션
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 0),
+              child: Container(
+                padding: const EdgeInsets.all(16.0),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 6.0,
+                      offset: Offset(2, 2),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "좌석 배정 내역",
+                      style: GoogleFonts.notoSans(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        color: Colors.black,
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    RichText(
+                      text: TextSpan(
+                        text: "좌석 정보: ",
+                        style: GoogleFonts.notoSans(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                          fontSize: 16,
+                        ),
+                        children: [
+                          TextSpan(
+                            text: "국제캠퍼스 제 1 열람실 43",
+                            style: GoogleFonts.notoSans(
+                              fontWeight: FontWeight.normal,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    RichText(
+                      text: TextSpan(
+                        text: "입실 시간: ",
+                        style: GoogleFonts.notoSans(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                          fontSize: 16,
+                        ),
+                        children: [
+                          TextSpan(
+                            text: "24/02/04 13:00",
+                            style: GoogleFonts.notoSans(
+                              fontWeight: FontWeight.normal,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    RichText(
+                      text: TextSpan(
+                        text: "퇴실 시간: ",
+                        style: GoogleFonts.notoSans(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                          fontSize: 16,
+                        ),
+                        children: [
+                          TextSpan(
+                            text: "24/02/04 17:00",
+                            style: GoogleFonts.notoSans(
+                              fontWeight: FontWeight.normal,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    RichText(
+                      text: TextSpan(
+                        text: "좌석 연장: ",
+                        style: GoogleFonts.notoSans(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                          fontSize: 16,
+                        ),
+                        children: [
+                          TextSpan(
+                            text: "1회 연장(2회 가능)",
+                            style: GoogleFonts.notoSans(
+                              fontWeight: FontWeight.normal,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    RichText(
+                      text: TextSpan(
+                        text: "입실 처리: ",
+                        style: GoogleFonts.notoSans(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                          fontSize: 16,
+                        ),
+                        children: [
+                          TextSpan(
+                            text: "승인",
+                            style: GoogleFonts.notoSans(
+                              fontWeight: FontWeight.normal,
+                              color: khblue,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        ElevatedButton(
+                          onPressed: () {},
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: khred,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                          ),
+                          child: Text("퇴실"),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {},
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: khblue,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                          ),
+                          child: Text("연장"),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            // 퇴실 알림 섹션
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 32.0),
+                child: Container(
+                  padding: const EdgeInsets.all(16.0),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20.0),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 6.0,
+                        offset: Offset(2, 2),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "퇴실 알림",
+                        style: GoogleFonts.notoSans(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                          color: Colors.black,
+                        ),
+                      ),
+                      Expanded(
+                        child: ListView.separated(
+                          itemCount: seats.length,
+                          separatorBuilder: (context, index) => Divider(
+                            color: Colors.grey[300],
+                            thickness: 1,
+                          ),
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 8.0),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      "${seats[index]['room']} ${seats[index]['name']}",
+                                      style: GoogleFonts.notoSans(
+                                        fontSize: 16,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: Icon(Icons.close, color: khred),
+                                    onPressed: () {
+                                      setState(() {
+                                        seats.removeAt(index);
+                                      });
+                                    },
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
