@@ -92,7 +92,7 @@ class _ReadingRoomState extends State<ReadingRoom> {
                             children: snapshot.data!.map((seat) => makeSeat(seat, context, containerSize)).toList(),
                           );
                         }
-                        return Text('로딩중');
+                        return Text('');
                       });
                     }),
                 ),
@@ -157,11 +157,12 @@ class _ReadingRoomState extends State<ReadingRoom> {
       top: ypos,
       child: GestureDetector(
         onTap: () {
+          if (isMySeat) return;
           if (isActive) {
             reserveDialog(context, widget.data, seat);
           }
           else {
-            alarmDialog(context, seat);
+            alarmDialog(context, widget.data, seat, widget.room['name']);
           }
         },
         child: Container(
@@ -312,9 +313,15 @@ void reserveDialog(BuildContext context, Map<String, dynamic> userData, Map<Stri
                             final data = jsonDecode(res.body) as Map<String, dynamic>;
                             if (!data['ok']) {
                               showSnackbar(context, data['err']);
+                              Navigator.of(context).pop();
+                              return;
                             }
-                            updateStatus(userData);
 
+                            await updateStatus(userData);
+
+                            setState(() {});
+
+                            Navigator.of(context).pop();
                             Navigator.of(context).pop();
                           },
                           child: Text(
@@ -392,7 +399,7 @@ class InfoBox extends StatelessWidget {
   }
 }
 
-void alarmDialog(BuildContext context, Map<String, dynamic> seat) {
+void alarmDialog(BuildContext context, Map<String, dynamic> userData, Map<String, dynamic> seat, String room) {
   showDialog(
     context: context,
     builder: (context) {
@@ -432,8 +439,26 @@ void alarmDialog(BuildContext context, Map<String, dynamic> seat) {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: khblue,
                       ),
-                      onPressed: () {
-                        // "예" 버튼에 대한 로직 추가
+                      onPressed: () async {
+                        final res = await http.post(
+                            Uri.parse('http://localhost:8080/seats/reserve/reserve'),
+                            headers: <String, String>{
+                              'Content-Type': 'application/json'
+                            },
+                            body: jsonEncode(<String, dynamic>{
+                              'id': userData['id'],
+                              'session': userData['cookie'][0],
+                              'seatNumber': seat['code'],
+                              'seatName': seat['name'],
+                              'seatGroup': room,
+                            })
+                        );
+
+                        final data = jsonDecode(res.body) as Map<String, dynamic>;
+                        if (!data['ok']) {
+                          showSnackbar(context, data['err']);
+                        }
+
                         Navigator.of(context).pop();
                       },
                       child: Text(

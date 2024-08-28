@@ -225,7 +225,7 @@ void tryLogin(context, id, pw) async {
       throw Exception(studentData['err']);
     }
 
-    updateStatus(studentData);
+    await updateStatus(studentData);
 
     Navigator.of(context).push(
       MaterialPageRoute(

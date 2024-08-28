@@ -34,8 +34,13 @@ Future<Map<String, dynamic>> getStatus(Map<String, dynamic> user) async {
   return jsonDecode(res.body) as Map<String, dynamic>;
 }
 
-void updateStatus(Map<String, dynamic> user) async {
+Future<void> updateStatus(Map<String, dynamic> user) async {
   final status = await getStatus(user);
   print('status $status');
   user['status'] = status['data']['data'];
+}
+
+String fromMillis(millis) {
+  DateTime dt = DateTime.fromMillisecondsSinceEpoch(millis);
+  return '${dt.year.toString()}/${dt.month.toString().padLeft(2, '0')}/${dt.day.toString().padLeft(2, '0')} ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
 }

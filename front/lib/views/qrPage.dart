@@ -90,7 +90,7 @@ class _QRpageState extends State<QRpage> {
                     }
                     return ofQR(snapshot.data!['QR']);
                   }
-                  return Text('로딩중');
+                  return Text('');
                 }
               )
             ]

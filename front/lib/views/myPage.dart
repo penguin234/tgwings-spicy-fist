@@ -4,6 +4,27 @@ import '../theme.dart';
 import 'readingRoom.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import './utils.dart';
+
+Future<List<dynamic>> getWatchSeats(Map<String, dynamic> userData) async {
+  final ls = await http.post(
+    Uri.parse('http://localhost:8080/seats/reserve/reserve/my'),
+    headers: <String, String>{
+      'Content-Type': 'application/json'
+    },
+    body: jsonEncode(<String, dynamic>{
+      'id': userData['id'],
+      'session': userData['cookie'][0],
+    }),
+  );
+
+  final res = jsonDecode(ls.body) as Map<String, dynamic>;
+  if (!res['ok']) {
+    return [];
+  }
+
+  return res['data'];
+}
 
 class MyPage extends StatefulWidget {
   final Map<String, dynamic> data;
@@ -16,31 +37,25 @@ class MyPage extends StatefulWidget {
 }
 
 class _MyPageState extends State<MyPage> {
-  List<Map<String, dynamic>> seats = [
-    {'room': '전자정보대학 열람실', 'name': '12'},
-    {'room': '벗터', 'name': '34'},
-    {'room': '제 2 열람실', 'name': '56'},
-    {'room': '제 1 열람실', 'name': '78'},
-    {'room': '벗터', 'name': '109'},
-  ];
+  List<dynamic> ls = [];
 
   List<bool> selectedSeats = [];
 
   @override
   void initState() {
     super.initState();
-    selectedSeats = List<bool>.filled(seats.length, false);
+    selectedSeats = List<bool>.filled(ls.length, false);
   }
 
   void deleteSelectedSeats() {
     setState(() {
-      seats = seats
+      ls = ls
           .asMap()
           .entries
           .where((entry) => !selectedSeats[entry.key])
           .map((entry) => entry.value)
           .toList();
-      selectedSeats = List<bool>.filled(seats.length, false);
+      selectedSeats = List<bool>.filled(ls.length, false);
     });
   }
 
@@ -149,7 +164,7 @@ class _MyPageState extends State<MyPage> {
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                  children: widget.data['status']['mySeat'] != null ? [
                     Text(
                       "좌석 배정 내역",
                       style: GoogleFonts.notoSans(
@@ -169,7 +184,7 @@ class _MyPageState extends State<MyPage> {
                         ),
                         children: [
                           TextSpan(
-                            text: "국제캠퍼스 제 1 열람실 43",
+                            text: "국제캠퍼스 ${widget.data['status']['mySeat']['seat']['group']['name']} ${widget.data['status']['mySeat']['seat']['name']}",
                             style: GoogleFonts.notoSans(
                               fontWeight: FontWeight.normal,
                               color: Colors.black,
@@ -188,7 +203,7 @@ class _MyPageState extends State<MyPage> {
                         ),
                         children: [
                           TextSpan(
-                            text: "24/02/04 13:00",
+                            text: "${fromMillis(widget.data['status']['mySeat']['confirmTime'])}",
                             style: GoogleFonts.notoSans(
                               fontWeight: FontWeight.normal,
                               color: Colors.black,
@@ -207,7 +222,7 @@ class _MyPageState extends State<MyPage> {
                         ),
                         children: [
                           TextSpan(
-                            text: "24/02/04 17:00",
+                            text: "${fromMillis(widget.data['status']['mySeat']['expireTime'])}",
                             style: GoogleFonts.notoSans(
                               fontWeight: FontWeight.normal,
                               color: Colors.black,
@@ -226,7 +241,7 @@ class _MyPageState extends State<MyPage> {
                         ),
                         children: [
                           TextSpan(
-                            text: "1회 연장(2회 가능)",
+                            text: "0회 연장(3회 가능)",
                             style: GoogleFonts.notoSans(
                               fontWeight: FontWeight.normal,
                               color: Colors.black,
@@ -245,7 +260,7 @@ class _MyPageState extends State<MyPage> {
                         ),
                         children: [
                           TextSpan(
-                            text: "승인",
+                            text: widget.data['status']['mySeat']['state'] == 5 ? "승인" : "미승인",
                             style: GoogleFonts.notoSans(
                               fontWeight: FontWeight.normal,
                               color: khblue,
@@ -259,7 +274,25 @@ class _MyPageState extends State<MyPage> {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () async {
+                            await http.post(
+                                Uri.parse('http://localhost:8080/user/seat/exit'),
+                                headers: <String, String>{
+                                  'Content-Type': 'application/json'
+                                },
+                                body: jsonEncode(<String, dynamic>{
+                                  'id': widget.data['id'],
+                                  'session': widget.data['cookie'][0],
+                                  'code': widget.data['status']['mySeat']['seat']['code'],
+                                })
+                            );
+
+                            await updateStatus(widget.data);
+
+                            setState(() {
+
+                            });
+                          },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: khred,
                             foregroundColor: Colors.white,
@@ -282,7 +315,25 @@ class _MyPageState extends State<MyPage> {
                         ),
                       ],
                     ),
-                  ],
+                  ] : [
+                    Text(
+                      "좌석 배정 내역",
+                      style: GoogleFonts.notoSans(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        color: Colors.black,
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      "배정 좌석 없음",
+                      style: GoogleFonts.notoSans(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ]
                 ),
               ),
             ),
@@ -303,53 +354,74 @@ class _MyPageState extends State<MyPage> {
                       ),
                     ],
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "퇴실 알림",
-                        style: GoogleFonts.notoSans(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                          color: Colors.black,
-                        ),
-                      ),
-                      Expanded(
-                        child: ListView.separated(
-                          itemCount: seats.length,
-                          separatorBuilder: (context, index) => Divider(
-                            color: Colors.grey[300],
-                            thickness: 1,
+                  child: FutureBuilder(future: getWatchSeats(widget.data), builder: (context, snapshot) {
+                      var ls = [];
+                      if (snapshot.hasData) {
+                        ls = snapshot.data!;
+                      }
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "퇴실 알림",
+                            style: GoogleFonts.notoSans(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                              color: Colors.black,
+                            ),
                           ),
-                          itemBuilder: (context, index) {
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 8.0),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      "${seats[index]['room']} ${seats[index]['name']}",
-                                      style: GoogleFonts.notoSans(
-                                        fontSize: 16,
-                                        color: Colors.black,
+                          Expanded(
+                            child: ListView.separated(
+                              itemCount: ls.length,
+                              separatorBuilder: (context, index) =>
+                                  Divider(
+                                    color: Colors.grey[300],
+                                    thickness: 1,
+                                  ),
+                              itemBuilder: (context, index) {
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 8.0),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          "${ls[index]['group']} ${ls[index]['name']}",
+                                          style: GoogleFonts.notoSans(
+                                            fontSize: 16,
+                                            color: Colors.black,
+                                          ),
+                                        ),
                                       ),
-                                    ),
+                                      IconButton(
+                                        icon: Icon(Icons.close, color: khred),
+                                        onPressed: () async {
+                                          await http.post(
+                                            Uri.parse('http://localhost:8080/seats/reserve/reserve/off'),
+                                            headers: <String, String>{
+                                              'Content-Type': 'application/json'
+                                            },
+                                            body: jsonEncode(<String, dynamic>{
+                                              'id': widget.data['id'],
+                                              'session': widget.data['cookie'][0],
+                                              'seatNumber': ls[index]['code'],
+                                            }),
+                                          );
+
+                                          setState(() {
+
+                                          });
+                                        },
+                                      ),
+                                    ],
                                   ),
-                                  IconButton(
-                                    icon: Icon(Icons.close, color: khred),
-                                    onPressed: () {
-                                      setState(() {
-                                        seats.removeAt(index);
-                                      });
-                                    },
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ],
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      );
+                    }
                   ),
                 ),
               ),
