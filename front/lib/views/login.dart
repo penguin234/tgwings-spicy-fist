@@ -24,14 +24,6 @@ class _MyLoginPageState extends State<MyLoginPage> {
   final TextEditingController _idController = TextEditingController();
   final TextEditingController _pwController = TextEditingController();
 
-  Future<http.Response> login(String id, String pw) {
-    return http.post(Uri.parse('http://localhost:8080/user/login'), // uri는 나중에 통신할 때 입력
-        headers: <String, String>{
-          'Content-Type': 'application/json'
-        },
-        body: jsonEncode(<String, String>{'id': id, 'pw': pw}));
-  }
-
   @override
   void dispose() {
     _idController.dispose();
@@ -130,6 +122,10 @@ class _MyLoginPageState extends State<MyLoginPage> {
                         ),
                       ),
                       controller: _idController,
+                      textInputAction: TextInputAction.go,
+                      onSubmitted: (value) {
+                        tryLogin(context, _idController.text, _pwController.text);
+                      },
                     ),
                     SizedBox(height: 16),
                     TextField(
@@ -145,6 +141,10 @@ class _MyLoginPageState extends State<MyLoginPage> {
                       ),
                       obscureText: true,
                       controller: _pwController,
+                      textInputAction: TextInputAction.go,
+                      onSubmitted: (value) {
+                        tryLogin(context, _idController.text, _pwController.text);
+                      },
                     ),
                     SizedBox(height: 16),
                     ElevatedButton(
@@ -153,24 +153,8 @@ class _MyLoginPageState extends State<MyLoginPage> {
                         surfaceTintColor: khblue,
                         foregroundColor: Colors.white,
                       ),
-                      onPressed: () async {
-                        try {
-                          final res = await login(_idController.text, _pwController.text);
-                          final studentData = jsonDecode(res.body) as Map<String, dynamic>;
-                          if (studentData['ok'] == false) {
-                            throw Exception(studentData['err']);
-                          }
-
-                          updateStatus(studentData);
-
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => MainPage(studentData),
-                            ),
-                          ); // 디버깅용으로 바꿔놓았는지 확인
-                        } catch (e) {
-                          showSnackbar(context, '로그인 실패');
-                        }
+                      onPressed: () {
+                        tryLogin(context, _idController.text, _pwController.text);
                       },
                       child: Text('Sign in'),
                     ),
@@ -222,5 +206,33 @@ class _MyLoginPageState extends State<MyLoginPage> {
         ],
       ),
     );
+  }
+}
+
+Future<http.Response> login(String id, String pw) {
+  return http.post(Uri.parse('http://localhost:8080/user/login'), // uri는 나중에 통신할 때 입력
+      headers: <String, String>{
+        'Content-Type': 'application/json'
+      },
+      body: jsonEncode(<String, String>{'id': id, 'pw': pw}));
+}
+
+void tryLogin(context, id, pw) async {
+  try {
+    final res = await login(id, pw);
+    final studentData = jsonDecode(res.body) as Map<String, dynamic>;
+    if (studentData['ok'] == false) {
+      throw Exception(studentData['err']);
+    }
+
+    updateStatus(studentData);
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => MainPage(studentData),
+      ),
+    ); // 디버깅용으로 바꿔놓았는지 확인
+  } catch (e) {
+    showSnackbar(context, '로그인 실패');
   }
 }
