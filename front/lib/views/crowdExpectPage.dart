@@ -26,10 +26,8 @@ Future<List<dynamic>> getRooms(_date, _time) async {
     'endTm': '0000'
   });
 
-  final d1 = await http.get(Uri.parse("http://192.168.1.136:8000/predict/${8}/$pdate/$ptime"));
-
   for (int i = 0; i < ls.length; i++) {
-    final pd = await http.get(Uri.parse("http://192.168.1.136:8000/predict/${ls[i]['code']}/$pdate/$ptime"));
+    final pd = await http.get(Uri.parse("http://localhost:8000/predict/${ls[i]['code']}/$pdate/$ptime"));
     ls[i]['predict'] = (jsonDecode(pd.body) as Map<String, dynamic>)['predict'];
   }
 
