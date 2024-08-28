@@ -110,7 +110,7 @@ class _QRpageState extends State<QRpage> {
         ),
         SizedBox(height: 20),
         Text(
-          "이 QR코드는${_formatTime(_deadline)}까지 유효합니다.",
+          "이 QR코드는 ${_formatTime(_deadline)}까지 유효합니다.",
           style: GoogleFonts.notoSans(
             fontSize: 17,
             color: Colors.white60,
