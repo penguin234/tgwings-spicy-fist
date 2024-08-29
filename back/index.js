@@ -216,7 +216,7 @@ app.post('/user/seat/use', (req, res) => {
         if (body['code'] != 1) {
             res.status(400).json({
                 ok: false,
-                err: body['message']
+                err: '예약 실패'
             })
             return
         }
