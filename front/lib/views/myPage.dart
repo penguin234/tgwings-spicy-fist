@@ -335,6 +335,9 @@ class _MyPageState extends State<MyPage> {
                             //widget.data['status']['mySeat']['expireTime'] += (widget.data['status']['mySeat']['expireTime'] - widget.data['status']['mySeat']['confirmTime']) ~/ (widget.data['status']['addCount'] + 1);
 
                             widget.data['status']['addCount']++;
+                            final temp = widget.data['status']['addCount'];
+                            await(updateStatus(widget.data));
+                            widget.data['status']['addCount'] = temp;
                             setState((){});
                           },
                           style: ElevatedButton.styleFrom(

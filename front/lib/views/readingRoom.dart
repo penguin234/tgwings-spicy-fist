@@ -106,7 +106,6 @@ class _ReadingRoomState extends State<ReadingRoom> {
 
   Widget makeSeat(seatData, context, containerSize) {
     Map<String, dynamic> seat = seatData as Map<String, dynamic>;
-    print(seat);
     final bool isActive = seat['seatTime'] == null;
     double xpos = ((seat['xpos'] / 1920) * containerSize.width);
     double ypos = ((seat['ypos'] / 900) * containerSize.height);
