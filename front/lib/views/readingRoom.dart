@@ -159,7 +159,7 @@ class _ReadingRoomState extends State<ReadingRoom> {
         onTap: () {
           if (isMySeat) return;
           if (isActive) {
-            reserveDialog(context, widget.data, seat);
+            reserveDialog(context, widget.data, seat, widget.room);
           }
           else {
             alarmDialog(context, widget.data, seat, widget.room['name']);
@@ -186,7 +186,7 @@ class _ReadingRoomState extends State<ReadingRoom> {
   }
 }
 
-void reserveDialog(BuildContext context, Map<String, dynamic> userData, Map<String, dynamic> seat) {
+void reserveDialog(BuildContext context, Map<String, dynamic> userData, Map<String, dynamic> seat, Map<String, dynamic> room) {
   int selectedHour = 1; // Default value
   int selectedMinute = 0; // Default value
   List<int> ableMinute = [0, 30];
@@ -297,25 +297,43 @@ void reserveDialog(BuildContext context, Map<String, dynamic> userData, Map<Stri
                             backgroundColor: khblue,
                           ),
                           onPressed: () async {
-                            final res = await http.post(
-                                Uri.parse('http://localhost:8080/user/seat/use'),
-                                headers: <String, String>{
-                                  'Content-Type': 'application/json'
-                                },
-                                body: jsonEncode(<String, dynamic>{
-                                  'id': userData['id'],
-                                  'session': userData['cookie'][0],
-                                  'code': seat['code'],
-                                  'time': selectedHour * 60 + selectedMinute
-                                })
-                            );
-
+                            final res;
+                            /*if(room['code'] == 12){
+                                  res = await http.post(
+                                  Uri.parse('http://localhost:8080/user/reserve'),
+                                  headers: <String, String>{
+                                    'Content-Type': 'application/json'
+                                  },
+                                  body: jsonEncode(<String, dynamic>{
+                                    'id': userData['id'],
+                                    'session': userData['cookie'][0],
+                                    'seatNumber': seat['code'],
+                                    'time': selectedHour * 60 + selectedMinute
+                                  })
+                              );
+                            } */
+                            //else{
+                                  res = await http.post(
+                                  Uri.parse('http://localhost:8080/user/seat/use'),
+                                  headers: <String, String>{
+                                    'Content-Type': 'application/json'
+                                  },
+                                  body: jsonEncode(<String, dynamic>{
+                                    'id': userData['id'],
+                                    'session': userData['cookie'][0],
+                                    'code': seat['code'],
+                                    'time': selectedHour * 60 + selectedMinute
+                                  })
+                              );
+                            //}
+                            print(res.body);
                             final data = jsonDecode(res.body) as Map<String, dynamic>;
                             if (!data['ok']) {
                               showSnackbar(context, data['err']);
                               Navigator.of(context).pop();
                               return;
                             }
+
 
                             await updateStatus(userData);
 
@@ -399,7 +417,7 @@ class InfoBox extends StatelessWidget {
   }
 }
 
-void alarmDialog(BuildContext context, Map<String, dynamic> userData, Map<String, dynamic> seat, String room) {
+void alarmDialog(BuildContext context, Map<String, dynamic> userData, Map<String, dynamic> seat, Map<String, dynamic> room) {
   showDialog(
     context: context,
     builder: (context) {
