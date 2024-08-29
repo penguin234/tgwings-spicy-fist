@@ -3,7 +3,7 @@ const app = express()
 
 const cors = require('cors');                           //서버간 통신 모듈
 app.use(cors())
-
+const { DateTime } = require('luxon');
 
 const bodyParser = require('body-parser')
 app.use(bodyParser.json())
@@ -297,6 +297,7 @@ app.get('/user/seat', (req, res) => {                   //예약한 자리 정�
 //자리 예약할 때 시간을 어떻게 처리할지 잘 모르겠음
 
 app.put('/user/reserve', (req,res) => {                 //자리 예약, 예약x -> 예약o
+    console.log(res.body,": body")
     const id = req.body.id
     const sessionRecv = req.body.session
     const session = database.getSession(id)
@@ -309,7 +310,7 @@ app.put('/user/reserve', (req,res) => {                 //자리 예약, 예약x
     }
 
     if(database.getSeatById(id).length != 0) {      //이미 예약한 자리 존재
-        res.status(400).json({
+        res.json({
             ok: false,
             err: 'already reserved seat'
         })
@@ -325,7 +326,7 @@ app.put('/user/reserve', (req,res) => {                 //자리 예약, 예약x
             return
         }
 
-        const reservedTime = req.body.reservedTime
+        const reservedTime = DateTime.now();
         const time = req.body.time
         database.reserveSeat(seatNumber,id,reservedTime,time)       //잘 모르겠는 부분
         res.json({
