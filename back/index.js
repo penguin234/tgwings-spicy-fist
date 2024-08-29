@@ -296,6 +296,12 @@ app.post('/user/seat/extend', (req, res) => {
             })
             return
         }
+
+        console.log('body ', body)
+
+        res.json({
+            ok: true
+        })
     })
 })
 

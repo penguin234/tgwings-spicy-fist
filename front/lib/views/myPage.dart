@@ -289,6 +289,8 @@ class _MyPageState extends State<MyPage> {
 
                             await updateStatus(widget.data);
 
+                            print("퇴실");
+
                             setState(() {
 
                             });
@@ -304,7 +306,29 @@ class _MyPageState extends State<MyPage> {
                         ),
                         ElevatedButton(
                           onPressed: () async {
-                            
+                            if (widget.data['status']['addCount'] >= 3) {
+                              showSnackbar(context, '연장 횟수 초과');
+                              return;
+                            }
+
+                            /*
+                            final res = await http.post(
+                              Uri.parse('http://localhost:8080/user/seat/extend'),
+                              headers: <String, String>{
+                                'Content-Type': 'application/json'
+                              },
+                              body: jsonEncode(<String, dynamic>{
+                                'id': widget.data['id'],
+                                'session': widget.data['cookie'][0],
+                                'code': widget.data['status']['mySeat']['seat']['code'],
+                                'group': widget.data['status']['mySeat']['seat']['group']['code']
+                              }),
+                            );
+
+                            print(jsonDecode(res.body));
+                            */
+                            widget.data['status']['mySeat']['expireTime'] += 4 * 60 * 60 * 1000;
+
                             widget.data['status']['addCount']++;
                             setState((){});
                           },
