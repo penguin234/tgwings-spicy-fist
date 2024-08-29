@@ -96,6 +96,16 @@ app.post('/user/status', (req, res) => {                 // 유저 정보 확인
         return
     }
 
+    const data = database.getSeatById(id)
+    if(data.length !== 0) {    
+        res.json({
+            ok: true,
+            ismy: true,
+            data: data[0]
+        })
+        return
+    }
+
     database.getUserInfo(database.getSession2(id), (data) => {
         res.json({
             ok: true,
@@ -132,10 +142,21 @@ app.post('/user/seat/exit', (req, res) => {
 
     database.getUserInfo(database.getSession2(id), (data) => {
         if (!data['data']['mySeat']) {
+            let data = database.getSeatById(id)
+            if (data.length == 0) {                          //예약한 자리 없음
+                res.status(404).json({
+                    ok: false,
+                    err: 'No reservation found for the given id'
+                })
+                return
+            }
+        
+            //예약된 좌석을 취소
+            database.deleteSeat(data)
+
             console.log('no seat err')
             res.status(404).json({
-                ok: false,
-                err: 'no using seat'
+                ok: true
             })
             return
         }
@@ -224,6 +245,50 @@ app.post('/user/seat/use', (req, res) => {
         res.json({
             ok: true
         })
+    })
+})
+
+app.post('/user/seat/extend', (req, res) => {
+    const id = req.body.id
+    if (!id) {
+        res.json({
+            ok: false,
+            err: 'id is required'
+        })
+        return
+    }
+
+    const sessionRecv = req.body.session
+    const session = database.getSession(id)
+
+    if (!session || !CheckSession(sessionRecv, session)) {
+        res.status(401).json({
+            ok: false,
+            err: 'incorrect Session'
+        })
+        return
+    }
+
+    request.post({
+        uri: 'https://libseat.khu.ac.kr/libraries/seat-extension',
+        body: {
+            "code": req.body.seat,
+            "groupCode": req.body.group,
+            "time": 60,
+            "beacon": [
+                {
+                    "major": 1,
+                    "minor": 1
+                }
+            ]
+        },
+        headers: {
+            'User-Agent': 'request',
+            Cookie: database.getSession2(req.body.id)
+        },
+        json: true
+    }, (err, result, body) => {
+        
     })
 })
 
@@ -326,8 +391,8 @@ app.put('/user/reserve', (req,res) => {                 //자리 예약, 예약x
             return
         }
 
-        const reservedTime = DateTime.now();
-        const time = req.body.time
+        const reservedTime = DateTime.now().toMillis();
+        const time = req.body.time;
         database.reserveSeat(seatNumber,id,reservedTime,time)       //잘 모르겠는 부분
         res.json({
             ok: true

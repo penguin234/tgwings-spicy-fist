@@ -81,16 +81,20 @@ const { DateTime } = require('luxon'); // Using luxon for date/time handling
 const checkAndResetSeats = () => {
     seats.forEach(seat => {
         if (seat.reservedTime) {
-            const reservationEnd = DateTime.fromISO(seat.reservedTime).plus({ minutes: seat.time });
+            // seat.reservedTime이 밀리세컨드 값이므로 DateTime 객체로 변환
+            const reservationEnd = DateTime.fromMillis(seat.reservedTime).plus({ minutes: seat.time });
             const now = DateTime.now();
 
-            if (1800000 <= reservationEnd - now && reservationEnd - now < 1810000) {            // Before 30 minutes
-                console.log("Before 30 minutes");                                           // 1800000 over 1860000 under if interval is 1 minute
-            }//test: 30000 over 40000 under if interval is 10 second
+            // reservationEnd와 현재 시간 now의 차이를 밀리세컨드 단위로 계산
+            const diff = reservationEnd.diff(now, 'milliseconds').milliseconds;
+
+            if (1800000 <= diff && diff < 1810000) {
+                console.log("Before 30 minutes");
+            }
 
             if (now >= reservationEnd) {
                 console.log(`Resetting seat ${seat.seatNumber} as its reservation has expired.`);
-                seatArray=[];
+                seatArray = [];
                 seatArray.push(seat);
                 deleteSeat(seatArray);
             }

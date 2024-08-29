@@ -37,7 +37,16 @@ Future<Map<String, dynamic>> getStatus(Map<String, dynamic> user) async {
 Future<void> updateStatus(Map<String, dynamic> user) async {
   final status = await getStatus(user);
   print('status $status');
+  if (status['ismy'] != null) {
+    user['status'] = {
+      'ismy': true,
+      'data': status['data'],
+      'addCount': 0,
+    };
+    return;
+  }
   user['status'] = status['data']['data'];
+  user['status']['addCount'] = 0;
 }
 
 String fromMillis(millis) {
