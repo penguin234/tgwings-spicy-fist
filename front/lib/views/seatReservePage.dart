@@ -4,15 +4,24 @@ import '../theme.dart';
 import 'readingRoom.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import './utils.dart';
 
 Future<List<dynamic>> getRooms() async {
   final res = await http.get(Uri.parse('https://libseat.khu.ac.kr/libraries/lib-status/2'));
   final data = jsonDecode(res.body) as Map<String, dynamic>;
   List<dynamic> ls = data['data'] as List<dynamic>;
+  final myls = await getSeats(12);
+  int usecount = 0;
+  for (final s in myls) {
+    if (s['seatTime'] != null) {
+      usecount++;
+    }
+  }
+  print(usecount);
   ls.add({
     'code': 12,
     'name': '자대 열람실',
-    'inUse': 0,
+    'inUse': usecount,
     'cnt': 47,
     'startTm': '0000',
     'endTm': '0000'

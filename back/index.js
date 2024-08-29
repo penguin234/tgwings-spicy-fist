@@ -534,6 +534,7 @@ app.post('/seats/reserve/reserve', (req,res) => {           //예약의 예약 �
     seatToRoom[seatNumber] = {}
     seatToRoom[seatNumber].name = req.body.seatName
     seatToRoom[seatNumber].group = req.body.seatGroup
+    seatToRoom[seatNumber].groupCode = req.body.groupCode
 
     res.json({
         ok: true,
@@ -594,7 +595,7 @@ app.post('/seats/reserve/reserve/my', (req,res) => {             // my reserve r
 
     res.json({
         ok: true,
-        data: session2.map((code) => ({'code': code, 'name': seatToRoom[code].name, 'group': seatToRoom[code].group}))
+        data: session2.map((code) => ({'code': code, 'name': seatToRoom[code].name, 'group': seatToRoom[code].group, 'groupCode': seatToRoom[code].groupCode}))
     })
 })
 

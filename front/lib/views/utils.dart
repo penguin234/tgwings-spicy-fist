@@ -53,3 +53,15 @@ String fromMillis(millis) {
   DateTime dt = DateTime.fromMillisecondsSinceEpoch(millis);
   return '${dt.year.toString()}/${dt.month.toString().padLeft(2, '0')}/${dt.day.toString().padLeft(2, '0')} ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
 }
+
+Future<List<dynamic>> getSeats(int roomCode) async {
+  if (roomCode == 12) {
+    final res = await http.get(Uri.parse('http://localhost:8080/room/seats'));
+    final data = jsonDecode(res.body) as Map<String, dynamic>;
+    return data['data'] as List<dynamic>;
+  }
+
+  final res = await http.get(Uri.parse('https://libseat.khu.ac.kr/libraries/seats/$roomCode'));
+  final data = jsonDecode(res.body) as Map<String, dynamic>;
+  return data['data'] as List<dynamic>;
+}

@@ -5,6 +5,13 @@ import 'readingRoom.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import './utils.dart';
+import 'dart:async';
+
+void watchSeatEmpty(ls) {
+  for (final seat in ls) {
+    print(seat);
+  }
+}
 
 Future<List<dynamic>> getWatchSeats(Map<String, dynamic> userData) async {
   final ls = await http.post(
@@ -41,10 +48,21 @@ class _MyPageState extends State<MyPage> {
 
   List<bool> selectedSeats = [];
 
+  late Timer timer;
+
   @override
   void initState() {
     super.initState();
     selectedSeats = List<bool>.filled(ls.length, false);
+    timer = Timer.periodic(Duration(seconds: 5), (timer) {
+      watchSeatEmpty(ls);
+    });
+  }
+
+  @override
+  void dispose() {
+    timer.cancel();
+    super.dispose();
   }
 
   void deleteSelectedSeats() {
@@ -545,7 +563,7 @@ class _MyPageState extends State<MyPage> {
                     ],
                   ),
                   child: FutureBuilder(future: getWatchSeats(widget.data), builder: (context, snapshot) {
-                      var ls = [];
+                      ls = [];
                       if (snapshot.hasData) {
                         ls = snapshot.data!;
                       }
