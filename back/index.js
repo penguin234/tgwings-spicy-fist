@@ -3,7 +3,7 @@ const app = express()
 
 const cors = require('cors');                           //서버간 통신 모듈
 app.use(cors())
-
+const { DateTime } = require('luxon');
 
 const bodyParser = require('body-parser')
 app.use(bodyParser.json())
@@ -216,7 +216,7 @@ app.post('/user/seat/use', (req, res) => {
         if (body['code'] != 1) {
             res.status(400).json({
                 ok: false,
-                err: body['message']
+                err: '예약 실패'
             })
             return
         }
@@ -297,6 +297,7 @@ app.get('/user/seat', (req, res) => {                   //예약한 자리 정�
 //자리 예약할 때 시간을 어떻게 처리할지 잘 모르겠음
 
 app.put('/user/reserve', (req,res) => {                 //자리 예약, 예약x -> 예약o
+    console.log(res.body,": body")
     const id = req.body.id
     const sessionRecv = req.body.session
     const session = database.getSession(id)
@@ -309,7 +310,7 @@ app.put('/user/reserve', (req,res) => {                 //자리 예약, 예약x
     }
 
     if(database.getSeatById(id).length != 0) {      //이미 예약한 자리 존재
-        res.status(400).json({
+        res.json({
             ok: false,
             err: 'already reserved seat'
         })
@@ -325,7 +326,7 @@ app.put('/user/reserve', (req,res) => {                 //자리 예약, 예약x
             return
         }
 
-        const reservedTime = req.body.reservedTime
+        const reservedTime = DateTime.now();
         const time = req.body.time
         database.reserveSeat(seatNumber,id,reservedTime,time)       //잘 모르겠는 부분
         res.json({
@@ -411,6 +412,8 @@ app.put('/seats/time/add', (req, res) => {                  //시간 연장
     })
 })
 
+const seatToRoom = {};
+
 app.post('/seats/reserve/reserve', (req,res) => {           //예약의 예약 추가
     const id = req.body.id
 
@@ -435,8 +438,12 @@ app.post('/seats/reserve/reserve', (req,res) => {           //예약의 예약 �
         })
         return
     }
-    database.getSeatBySeatNumber(seatNumber)[0].reserveReserve.push(id)     //seat DB의 reserveReserve키의 벨류값은 리스트
+    // database.getSeatBySeatNumber(seatNumber)[0].reserveReserve.push(id)     //seat DB의 reserveReserve키의 벨류값은 리스트
     session2.push(seatNumber)
+
+    seatToRoom[seatNumber] = {}
+    seatToRoom[seatNumber].name = req.body.seatName
+    seatToRoom[seatNumber].group = req.body.seatGroup
 
     res.json({
         ok: true,
@@ -479,7 +486,7 @@ app.post('/seats/reserve/reserve/off', (req,res) => {
     })
 })
 
-app.get('/seats/reserve/reserve/my', (req,res) => {             // my reserve reserve
+app.post('/seats/reserve/reserve/my', (req,res) => {             // my reserve reserve
     const id = req.body.id
 
     const sessionRecv = req.body.session
@@ -494,10 +501,10 @@ app.get('/seats/reserve/reserve/my', (req,res) => {             // my reserve re
     }
     
     const session2 = database.getSession3(id)
-    
+
     res.json({
         ok: true,
-        data: session2
+        data: session2.map((code) => ({'code': code, 'name': seatToRoom[code].name, 'group': seatToRoom[code].group}))
     })
 })
 
@@ -506,53 +513,53 @@ app.get('/room/seats', (req, res) => {
     res.json({
         ok: true,
         data: [
-            {"name":"1","xpos":1389,"ypos":747,"width":45,"height":30,"textSize":12},
-            {"name":"2","xpos":1293,"ypos":747,"width":45,"height":30,"textSize":12},
-            {"name":"3","xpos":1197,"ypos":747,"width":45,"height":30,"textSize":12},
-            {"name":"4","xpos":1101,"ypos":747,"width":45,"height":30,"textSize":12},
-            {"name":"5","xpos":1005,"ypos":747,"width":45,"height":30,"textSize":12},
-            {"name":"6","xpos":909,"ypos":747,"width":45,"height":30,"textSize":12},
-            {"name":"7","xpos":1389,"ypos":627,"width":45,"height":30,"textSize":12},
-            {"name":"8","xpos":1293,"ypos":627,"width":45,"height":30,"textSize":12},
-            {"name":"9","xpos":1197,"ypos":627,"width":45,"height":30,"textSize":12},
-            {"name":"10","xpos":1101,"ypos":627,"width":45,"height":30,"textSize":12},
-            {"name":"11","xpos":1005,"ypos":627,"width":45,"height":30,"textSize":12},
-            {"name":"12","xpos":909,"ypos":627,"width":45,"height":30,"textSize":12},
-            {"name":"13","xpos":1389,"ypos":579,"width":45,"height":30,"textSize":12},
-            {"name":"14","xpos":1293,"ypos":579,"width":45,"height":30,"textSize":12},
-            {"name":"15","xpos":1197,"ypos":579,"width":45,"height":30,"textSize":12},
-            {"name":"16","xpos":1101,"ypos":579,"width":45,"height":30,"textSize":12},
-            {"name":"17","xpos":1005,"ypos":579,"width":45,"height":30,"textSize":12},
-            {"name":"18","xpos":909,"ypos":579,"width":45,"height":30,"textSize":12},
-            {"name":"19","xpos":1389,"ypos":506,"width":45,"height":30,"textSize":12},
-            {"name":"20","xpos":1293,"ypos":506,"width":45,"height":30,"textSize":12},
-            {"name":"21","xpos":1197,"ypos":506,"width":45,"height":30,"textSize":12},
-            {"name":"22","xpos":1101,"ypos":506,"width":45,"height":30,"textSize":12},
-            {"name":"23","xpos":1005,"ypos":506,"width":45,"height":30,"textSize":12},
-            {"name":"24","xpos":1293,"ypos":391,"width":45,"height":30,"textSize":12},
-            {"name":"25","xpos":1197,"ypos":391,"width":45,"height":30,"textSize":12},
-            {"name":"26","xpos":1101,"ypos":391,"width":45,"height":30,"textSize":12},
-            {"name":"27","xpos":1005,"ypos":391,"width":45,"height":30,"textSize":12},
-            {"name":"28","xpos":1389,"ypos":333,"width":45,"height":30,"textSize":12},
-            {"name":"29","xpos":1293,"ypos":333,"width":45,"height":30,"textSize":12},
-            {"name":"30","xpos":1197,"ypos":333,"width":45,"height":30,"textSize":12},
-            {"name":"31","xpos":1101,"ypos":333,"width":45,"height":30,"textSize":12},
-            {"name":"32","xpos":1005,"ypos":333,"width":45,"height":30,"textSize":12},
-            {"name":"33","xpos":1389,"ypos":228,"width":45,"height":30,"textSize":12},
-            {"name":"34","xpos":1293,"ypos":228,"width":45,"height":30,"textSize":12},
-            {"name":"35","xpos":1197,"ypos":228,"width":45,"height":30,"textSize":12},
-            {"name":"36","xpos":1101,"ypos":228,"width":45,"height":30,"textSize":12},
-            {"name":"37","xpos":1005,"ypos":228,"width":45,"height":30,"textSize":12},
-            {"name":"38","xpos":612,"ypos":596,"width":30,"height":45,"textSize":12},
-            {"name":"39","xpos":612,"ypos":503,"width":30,"height":45,"textSize":12},
-            {"name":"40","xpos":612,"ypos":409,"width":30,"height":45,"textSize":12},
-            {"name":"41","xpos":612,"ypos":316,"width":30,"height":45,"textSize":12},
-            {"name":"42","xpos":612,"ypos":223,"width":30,"height":45,"textSize":12},
-            {"name":"43","xpos":754,"ypos":446,"width":30,"height":45,"textSize":12},
-            {"name":"44","xpos":754,"ypos":352,"width":30,"height":45,"textSize":12},
-            {"name":"45","xpos":815,"ypos":446,"width":30,"height":45,"textSize":12},
-            {"name":"46","xpos":815,"ypos":352,"width":30,"height":45,"textSize":12},
-            {"name":"47","xpos":769,"ypos":293,"width":45,"height":30,"textSize":12},
+            {"code":1,"name":"1","xpos":1389,"ypos":747,"width":45,"height":30,"textSize":12},
+            {"code":2,"name":"2","xpos":1293,"ypos":747,"width":45,"height":30,"textSize":12},
+            {"code":3,"name":"3","xpos":1197,"ypos":747,"width":45,"height":30,"textSize":12},
+            {"code":4,"name":"4","xpos":1101,"ypos":747,"width":45,"height":30,"textSize":12},
+            {"code":5,"name":"5","xpos":1005,"ypos":747,"width":45,"height":30,"textSize":12},
+            {"code":6,"name":"6","xpos":909,"ypos":747,"width":45,"height":30,"textSize":12},
+            {"code":7,"name":"7","xpos":1389,"ypos":627,"width":45,"height":30,"textSize":12},
+            {"code":8,"name":"8","xpos":1293,"ypos":627,"width":45,"height":30,"textSize":12},
+            {"code":9,"name":"9","xpos":1197,"ypos":627,"width":45,"height":30,"textSize":12},
+            {"code":10,"name":"10","xpos":1101,"ypos":627,"width":45,"height":30,"textSize":12},
+            {"code":11,"name":"11","xpos":1005,"ypos":627,"width":45,"height":30,"textSize":12},
+            {"code":12,"name":"12","xpos":909,"ypos":627,"width":45,"height":30,"textSize":12},
+            {"code":13,"name":"13","xpos":1389,"ypos":579,"width":45,"height":30,"textSize":12},
+            {"code":14,"name":"14","xpos":1293,"ypos":579,"width":45,"height":30,"textSize":12},
+            {"code":15,"name":"15","xpos":1197,"ypos":579,"width":45,"height":30,"textSize":12},
+            {"code":16,"name":"16","xpos":1101,"ypos":579,"width":45,"height":30,"textSize":12},
+            {"code":17,"name":"17","xpos":1005,"ypos":579,"width":45,"height":30,"textSize":12},
+            {"code":18,"name":"18","xpos":909,"ypos":579,"width":45,"height":30,"textSize":12},
+            {"code":19,"name":"19","xpos":1389,"ypos":506,"width":45,"height":30,"textSize":12},
+            {"code":20,"name":"20","xpos":1293,"ypos":506,"width":45,"height":30,"textSize":12},
+            {"code":21,"name":"21","xpos":1197,"ypos":506,"width":45,"height":30,"textSize":12},
+            {"code":22,"name":"22","xpos":1101,"ypos":506,"width":45,"height":30,"textSize":12},
+            {"code":23,"name":"23","xpos":1005,"ypos":506,"width":45,"height":30,"textSize":12},
+            {"code":24,"name":"24","xpos":1293,"ypos":391,"width":45,"height":30,"textSize":12},
+            {"code":25,"name":"25","xpos":1197,"ypos":391,"width":45,"height":30,"textSize":12},
+            {"code":26,"name":"26","xpos":1101,"ypos":391,"width":45,"height":30,"textSize":12},
+            {"code":27,"name":"27","xpos":1005,"ypos":391,"width":45,"height":30,"textSize":12},
+            {"code":28,"name":"28","xpos":1389,"ypos":333,"width":45,"height":30,"textSize":12},
+            {"code":29,"name":"29","xpos":1293,"ypos":333,"width":45,"height":30,"textSize":12},
+            {"code":30,"name":"30","xpos":1197,"ypos":333,"width":45,"height":30,"textSize":12},
+            {"code":31,"name":"31","xpos":1101,"ypos":333,"width":45,"height":30,"textSize":12},
+            {"code":32,"name":"32","xpos":1005,"ypos":333,"width":45,"height":30,"textSize":12},
+            {"code":33,"name":"33","xpos":1389,"ypos":228,"width":45,"height":30,"textSize":12},
+            {"code":34,"name":"34","xpos":1293,"ypos":228,"width":45,"height":30,"textSize":12},
+            {"code":35,"name":"35","xpos":1197,"ypos":228,"width":45,"height":30,"textSize":12},
+            {"code":36,"name":"36","xpos":1101,"ypos":228,"width":45,"height":30,"textSize":12},
+            {"code":37,"name":"37","xpos":1005,"ypos":228,"width":45,"height":30,"textSize":12},
+            {"code":38,"name":"38","xpos":612,"ypos":596,"width":30,"height":45,"textSize":12},
+            {"code":39,"name":"39","xpos":612,"ypos":503,"width":30,"height":45,"textSize":12},
+            {"code":40,"name":"40","xpos":612,"ypos":409,"width":30,"height":45,"textSize":12},
+            {"code":41,"name":"41","xpos":612,"ypos":316,"width":30,"height":45,"textSize":12},
+            {"code":42,"name":"42","xpos":612,"ypos":223,"width":30,"height":45,"textSize":12},
+            {"code":43,"name":"43","xpos":754,"ypos":446,"width":30,"height":45,"textSize":12},
+            {"code":44,"name":"44","xpos":754,"ypos":352,"width":30,"height":45,"textSize":12},
+            {"code":45,"name":"45","xpos":815,"ypos":446,"width":30,"height":45,"textSize":12},
+            {"code":46,"name":"46","xpos":815,"ypos":352,"width":30,"height":45,"textSize":12},
+            {"code":47,"name":"47","xpos":769,"ypos":293,"width":45,"height":30,"textSize":12},
         ]
     })
 })

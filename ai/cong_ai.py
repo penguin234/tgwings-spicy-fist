@@ -14,7 +14,7 @@ codetoc = {
 
 models = {}
 for column in columns:
-    model_filename = "ai/pkl/" + f"{column}_model.pkl"
+    model_filename = "pkl/" + f"{column}_model.pkl"
     model = joblib.load(model_filename)
     models[column] = model
 print('model loaded')
@@ -51,15 +51,11 @@ def load_and_predict(future_data, target_column):
     print(f"Congestion rate: {congestion_rate:.2f}%")
 
 
-future_data1 = pd.DataFrame({
-    'date': ['6/22/2025'],
-    'time': ['20:30'],
+future_data = pd.DataFrame({
+    'date': ['4/10/2025'],
+    'time': ['18:30'],
 })
 
-future_data2 = pd.DataFrame({
-    'date': ['3/10/2025'],
-    'time': ['12:30'],
-})
 
 app = FastAPI()
 print('app made')

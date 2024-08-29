@@ -92,7 +92,7 @@ class _ReadingRoomState extends State<ReadingRoom> {
                             children: snapshot.data!.map((seat) => makeSeat(seat, context, containerSize)).toList(),
                           );
                         }
-                        return Text('로딩중');
+                        return Text('');
                       });
                     }),
                 ),
@@ -157,11 +157,12 @@ class _ReadingRoomState extends State<ReadingRoom> {
       top: ypos,
       child: GestureDetector(
         onTap: () {
+          if (isMySeat) return;
           if (isActive) {
-            reserveDialog(context, widget.data, seat);
+            reserveDialog(context, widget.data, seat, widget.room);
           }
           else {
-            alarmDialog(context, seat);
+            alarmDialog(context, widget.data, seat, widget.room['name']);
           }
         },
         child: Container(
@@ -185,7 +186,7 @@ class _ReadingRoomState extends State<ReadingRoom> {
   }
 }
 
-void reserveDialog(BuildContext context, Map<String, dynamic> userData, Map<String, dynamic> seat) {
+void reserveDialog(BuildContext context, Map<String, dynamic> userData, Map<String, dynamic> seat, Map<String, dynamic> room) {
   int selectedHour = 1; // Default value
   int selectedMinute = 0; // Default value
   List<int> ableMinute = [0, 30];
@@ -296,25 +297,49 @@ void reserveDialog(BuildContext context, Map<String, dynamic> userData, Map<Stri
                             backgroundColor: khblue,
                           ),
                           onPressed: () async {
-                            final res = await http.post(
-                                Uri.parse('http://localhost:8080/user/seat/use'),
-                                headers: <String, String>{
-                                  'Content-Type': 'application/json'
-                                },
-                                body: jsonEncode(<String, dynamic>{
-                                  'id': userData['id'],
-                                  'session': userData['cookie'][0],
-                                  'code': seat['code'],
-                                  'time': selectedHour * 60 + selectedMinute
-                                })
-                            );
-
+                            final res;
+                            /*if(room['code'] == 12){
+                                  res = await http.post(
+                                  Uri.parse('http://localhost:8080/user/reserve'),
+                                  headers: <String, String>{
+                                    'Content-Type': 'application/json'
+                                  },
+                                  body: jsonEncode(<String, dynamic>{
+                                    'id': userData['id'],
+                                    'session': userData['cookie'][0],
+                                    'seatNumber': seat['code'],
+                                    'time': selectedHour * 60 + selectedMinute
+                                  })
+                              );
+                            } */
+                            //else{
+                                  res = await http.post(
+                                  Uri.parse('http://localhost:8080/user/seat/use'),
+                                  headers: <String, String>{
+                                    'Content-Type': 'application/json'
+                                  },
+                                  body: jsonEncode(<String, dynamic>{
+                                    'id': userData['id'],
+                                    'session': userData['cookie'][0],
+                                    'code': seat['code'],
+                                    'time': selectedHour * 60 + selectedMinute
+                                  })
+                              );
+                            //}
+                            print(res.body);
                             final data = jsonDecode(res.body) as Map<String, dynamic>;
                             if (!data['ok']) {
                               showSnackbar(context, data['err']);
+                              Navigator.of(context).pop();
+                              return;
                             }
-                            updateStatus(userData);
 
+
+                            await updateStatus(userData);
+
+                            setState(() {});
+
+                            Navigator.of(context).pop();
                             Navigator.of(context).pop();
                           },
                           child: Text(
@@ -392,7 +417,7 @@ class InfoBox extends StatelessWidget {
   }
 }
 
-void alarmDialog(BuildContext context, Map<String, dynamic> seat) {
+void alarmDialog(BuildContext context, Map<String, dynamic> userData, Map<String, dynamic> seat, Map<String, dynamic> room) {
   showDialog(
     context: context,
     builder: (context) {
@@ -432,8 +457,26 @@ void alarmDialog(BuildContext context, Map<String, dynamic> seat) {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: khblue,
                       ),
-                      onPressed: () {
-                        // "예" 버튼에 대한 로직 추가
+                      onPressed: () async {
+                        final res = await http.post(
+                            Uri.parse('http://localhost:8080/seats/reserve/reserve'),
+                            headers: <String, String>{
+                              'Content-Type': 'application/json'
+                            },
+                            body: jsonEncode(<String, dynamic>{
+                              'id': userData['id'],
+                              'session': userData['cookie'][0],
+                              'seatNumber': seat['code'],
+                              'seatName': seat['name'],
+                              'seatGroup': room,
+                            })
+                        );
+
+                        final data = jsonDecode(res.body) as Map<String, dynamic>;
+                        if (!data['ok']) {
+                          showSnackbar(context, data['err']);
+                        }
+
                         Navigator.of(context).pop();
                       },
                       child: Text(
