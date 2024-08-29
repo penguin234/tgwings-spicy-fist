@@ -106,6 +106,7 @@ class _ReadingRoomState extends State<ReadingRoom> {
 
   Widget makeSeat(seatData, context, containerSize) {
     Map<String, dynamic> seat = seatData as Map<String, dynamic>;
+    print(seat);
     final bool isActive = seat['seatTime'] == null;
     double xpos = ((seat['xpos'] / 1920) * containerSize.width);
     double ypos = ((seat['ypos'] / 900) * containerSize.height);
@@ -123,6 +124,9 @@ class _ReadingRoomState extends State<ReadingRoom> {
       if (widget.data['status']['mySeat']['seat']['code'] == seat['code']) {
         isMySeat = true;
       }
+    }
+    if (widget.data['status']['ismy'] != null) {
+      isMySeat = widget.data['status']['data']['seatNumber'] == seat['code'];
     }
 
     // for some correcting positions

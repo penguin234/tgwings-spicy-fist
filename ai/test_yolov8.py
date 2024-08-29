@@ -6,7 +6,7 @@ model = YOLO('ai/yolov8n.pt')
 
 cap = cv2.VideoCapture(0)
 
-frame_interval = 5
+frame_interval = 1
 frame_count = 0
 
 while cap.isOpened():

@@ -311,7 +311,6 @@ class _MyPageState extends State<MyPage> {
                               return;
                             }
 
-                            /*
                             final res = await http.post(
                               Uri.parse('http://localhost:8080/user/seat/extend'),
                               headers: <String, String>{
@@ -320,15 +319,19 @@ class _MyPageState extends State<MyPage> {
                               body: jsonEncode(<String, dynamic>{
                                 'id': widget.data['id'],
                                 'session': widget.data['cookie'][0],
-                                'code': widget.data['status']['mySeat']['seat']['code'],
+                                'seat': widget.data['status']['mySeat']['seat']['code'],
                                 'group': widget.data['status']['mySeat']['seat']['group']['code']
                               }),
                             );
 
-                            print(jsonDecode(res.body));
-                            */
-                            widget.data['status']['mySeat']['expireTime'] +=
-                              (widget.data['status']['mySeat']['expireTime'] - widget.data['status']['mySeat']['confirmTime']) ~/ (widget.data['status']['addCount'] + 1);
+                            final data = jsonDecode(res.body) as Map<String, dynamic>;
+                            print(data);
+                            if (!data['ok']) {
+                              showSnackbar(context, data['err']);
+                              return;
+                            }
+
+                            //widget.data['status']['mySeat']['expireTime'] += (widget.data['status']['mySeat']['expireTime'] - widget.data['status']['mySeat']['confirmTime']) ~/ (widget.data['status']['addCount'] + 1);
 
                             widget.data['status']['addCount']++;
                             setState((){});
