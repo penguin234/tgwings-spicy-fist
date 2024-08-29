@@ -320,7 +320,8 @@ class _MyPageState extends State<MyPage> {
                                 'id': widget.data['id'],
                                 'session': widget.data['cookie'][0],
                                 'seat': widget.data['status']['mySeat']['seat']['code'],
-                                'group': widget.data['status']['mySeat']['seat']['group']['code']
+                                'group': widget.data['status']['mySeat']['seat']['group']['code'],
+                                'time': (widget.data['status']['mySeat']['expireTime'] - widget.data['status']['mySeat']['confirmTime']) ~/ (widget.data['status']['addCount'] + 1) ~/ (1000 * 60)
                               }),
                             );
 

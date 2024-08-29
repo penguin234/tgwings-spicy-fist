@@ -271,13 +271,14 @@ app.post('/user/seat/extend', (req, res) => {
 
     console.log('seat ', req.body.seat)
     console.log('group ', req.body.group)
+    console.log('time ', req.body.time)
 
     request.post({
         uri: 'https://libseat.khu.ac.kr/libraries/seat-extension',
         body: {
             "code": req.body.seat,
             "groupCode": req.body.group,
-            "time": 60,
+            "time": req.body.time,
             "beacon": [
                 {
                     "major": 1,
