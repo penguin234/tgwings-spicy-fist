@@ -327,7 +327,8 @@ class _MyPageState extends State<MyPage> {
 
                             print(jsonDecode(res.body));
                             */
-                            widget.data['status']['mySeat']['expireTime'] += 4 * 60 * 60 * 1000;
+                            widget.data['status']['mySeat']['expireTime'] +=
+                              (widget.data['status']['mySeat']['expireTime'] - widget.data['status']['mySeat']['confirmTime']) ~/ (widget.data['status']['addCount'] + 1);
 
                             widget.data['status']['addCount']++;
                             setState((){});

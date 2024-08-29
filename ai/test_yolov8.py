@@ -1,5 +1,6 @@
 import cv2
 from ultralytics import YOLO
+import time
 
 model = YOLO('ai/yolov8n.pt')
 
@@ -36,6 +37,8 @@ while cap.isOpened():
         frame_count += 1
     else:
         break
+
+    time.sleep(1)
 
 cap.release()
 cv2.destroyAllWindows()
