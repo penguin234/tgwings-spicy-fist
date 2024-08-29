@@ -146,10 +146,10 @@ class _ReadingRoomState extends State<ReadingRoom> {
 
     if (widget.room['code'] == 12) {
       // 자대 열람실
-      xpos *= 0.9;
-      width *= 0.9;
-      ypos *= 0.85;
-      height *= 0.85;
+      //xpos *= 0.9;
+      //width *= 0.9;
+      //ypos *= 0.85;
+      //height *= 0.85;
     }
 
     return Positioned(
