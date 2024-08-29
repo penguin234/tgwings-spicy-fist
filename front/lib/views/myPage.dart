@@ -303,7 +303,8 @@ class _MyPageState extends State<MyPage> {
                           child: Text("퇴실"),
                         ),
                         ElevatedButton(
-                          onPressed: () {
+                          onPressed: () async {
+                            
                             widget.data['status']['addCount']++;
                             setState((){});
                           },

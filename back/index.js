@@ -288,7 +288,14 @@ app.post('/user/seat/extend', (req, res) => {
         },
         json: true
     }, (err, result, body) => {
-        
+        if (err) {
+            console.log('err ', err)
+            res.json({
+                ok: false,
+                err: err
+            })
+            return
+        }
     })
 })
 
