@@ -7,10 +7,21 @@ import 'dart:convert';
 import './utils.dart';
 import 'dart:async';
 
-void watchSeatEmpty(ls) {
-  for (final seat in ls) {
-    print(seat);
+Future<List<bool>> watchSeatEmpty(ls) async {
+  Map<int, bool> isEmpty = {};
+
+  for (int rc in [8, 9, 10, 11, 12]) {
+    for (final s in await getSeats(rc)) {
+      isEmpty[s['code']] = s['seatTime'] == null;
+    }
   }
+
+  List<bool> outs = [];
+  for (int i = 0; i < ls.length; i++) {
+    final seat = ls[i];
+    outs.add(isEmpty[seat['code']] == true);
+  }
+  return outs;
 }
 
 Future<List<dynamic>> getWatchSeats(Map<String, dynamic> userData) async {
@@ -54,8 +65,29 @@ class _MyPageState extends State<MyPage> {
   void initState() {
     super.initState();
     selectedSeats = List<bool>.filled(ls.length, false);
-    timer = Timer.periodic(Duration(seconds: 5), (timer) {
-      watchSeatEmpty(ls);
+    timer = Timer.periodic(Duration(seconds: 5), (timer) async {
+      final res = await watchSeatEmpty(ls);
+      for (int i = 0; i < ls.length; i++) {
+        if (res[i]) {
+          showSnackbar(context, "퇴실 알림: ${ls[i]['group']} ${ls[i]['name']}");
+
+          await http.post(
+            Uri.parse('http://localhost:8080/seats/reserve/reserve/off'),
+            headers: <String, String>{
+              'Content-Type': 'application/json'
+            },
+            body: jsonEncode(<String, dynamic>{
+              'id': widget.data['id'],
+              'session': widget.data['cookie'][0],
+              'seatNumber': ls[i]['code'],
+            }),
+          );
+        }
+      }
+
+      ls = await getWatchSeats(widget.data);
+
+      setState((){});
     });
   }
 
@@ -509,6 +541,7 @@ class _MyPageState extends State<MyPage> {
                         ),
                         ElevatedButton(
                           onPressed: () {
+                            widget.data['status']['data']['time'] += widget.data['status']['data']['time'] ~/ (widget.data['status']['addCount'] + 1);
                             widget.data['status']['addCount']++;
                             setState((){});
                           },

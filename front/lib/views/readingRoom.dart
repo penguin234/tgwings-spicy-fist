@@ -325,7 +325,6 @@ void reserveDialog(BuildContext context, Map<String, dynamic> userData, Map<Stri
                               return;
                             }
 
-
                             await updateStatus(userData);
 
                             setState(() {});

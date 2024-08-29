@@ -656,8 +656,6 @@ app.get('/room/seats', (req, res) => {
         }
     })
 
-    console.log("haha ", database.getSeatBySeatNumber(40)[0].id)
-
     res.json({
         ok: true,
         data: data

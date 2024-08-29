@@ -17,7 +17,6 @@ Future<List<dynamic>> getRooms() async {
       usecount++;
     }
   }
-  print(usecount);
   ls.add({
     'code': 12,
     'name': '자대 열람실',
