@@ -5,6 +5,24 @@ import 'readingRoom.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import './utils.dart';
+import 'dart:async';
+
+Future<List<bool>> watchSeatEmpty(ls) async {
+  Map<int, bool> isEmpty = {};
+
+  for (int rc in [8, 9, 10, 11, 12]) {
+    for (final s in await getSeats(rc)) {
+      isEmpty[s['code']] = s['seatTime'] == null;
+    }
+  }
+
+  List<bool> outs = [];
+  for (int i = 0; i < ls.length; i++) {
+    final seat = ls[i];
+    outs.add(isEmpty[seat['code']] == true);
+  }
+  return outs;
+}
 
 Future<List<dynamic>> getWatchSeats(Map<String, dynamic> userData) async {
   final ls = await http.post(
@@ -41,10 +59,42 @@ class _MyPageState extends State<MyPage> {
 
   List<bool> selectedSeats = [];
 
+  late Timer timer;
+
   @override
   void initState() {
     super.initState();
     selectedSeats = List<bool>.filled(ls.length, false);
+    timer = Timer.periodic(Duration(seconds: 5), (timer) async {
+      final res = await watchSeatEmpty(ls);
+      for (int i = 0; i < ls.length; i++) {
+        if (res[i]) {
+          showSnackbar(context, "퇴실 알림: ${ls[i]['group']} ${ls[i]['name']}");
+
+          await http.post(
+            Uri.parse('http://localhost:8080/seats/reserve/reserve/off'),
+            headers: <String, String>{
+              'Content-Type': 'application/json'
+            },
+            body: jsonEncode(<String, dynamic>{
+              'id': widget.data['id'],
+              'session': widget.data['cookie'][0],
+              'seatNumber': ls[i]['code'],
+            }),
+          );
+        }
+      }
+
+      ls = await getWatchSeats(widget.data);
+
+      setState((){});
+    });
+  }
+
+  @override
+  void dispose() {
+    timer.cancel();
+    super.dispose();
   }
 
   void deleteSelectedSeats() {
@@ -289,6 +339,8 @@ class _MyPageState extends State<MyPage> {
 
                             await updateStatus(widget.data);
 
+                            print("퇴실");
+
                             setState(() {
 
                             });
@@ -303,7 +355,196 @@ class _MyPageState extends State<MyPage> {
                           child: Text("퇴실"),
                         ),
                         ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () async {
+                            if (widget.data['status']['addCount'] >= 3) {
+                              showSnackbar(context, '연장 횟수 초과');
+                              return;
+                            }
+
+                            final res = await http.post(
+                              Uri.parse('http://localhost:8080/user/seat/extend'),
+                              headers: <String, String>{
+                                'Content-Type': 'application/json'
+                              },
+                              body: jsonEncode(<String, dynamic>{
+                                'id': widget.data['id'],
+                                'session': widget.data['cookie'][0],
+                                'seat': widget.data['status']['mySeat']['seat']['code'],
+                                'group': widget.data['status']['mySeat']['seat']['group']['code'],
+                                'time': (widget.data['status']['mySeat']['expireTime'] - widget.data['status']['mySeat']['confirmTime']) ~/ (widget.data['status']['addCount'] + 1) ~/ (1000 * 60)
+                              }),
+                            );
+
+                            final data = jsonDecode(res.body) as Map<String, dynamic>;
+                            print(data);
+                            if (!data['ok']) {
+                              showSnackbar(context, data['err']);
+                              return;
+                            }
+
+                            //widget.data['status']['mySeat']['expireTime'] += (widget.data['status']['mySeat']['expireTime'] - widget.data['status']['mySeat']['confirmTime']) ~/ (widget.data['status']['addCount'] + 1);
+
+                            widget.data['status']['addCount']++;
+                            final temp = widget.data['status']['addCount'];
+                            await(updateStatus(widget.data));
+                            widget.data['status']['addCount'] = temp;
+                            setState((){});
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: khblue,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                          ),
+                          child: Text("연장"),
+                        ),
+                      ],
+                    ),
+                  ] : (widget.data['status']['ismy'] != null ? [
+                    Text(
+                      "좌석 배정 내역",
+                      style: GoogleFonts.notoSans(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        color: Colors.black,
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    RichText(
+                      text: TextSpan(
+                        text: "좌석 정보: ",
+                        style: GoogleFonts.notoSans(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                          fontSize: 16,
+                        ),
+                        children: [
+                          TextSpan(
+                            text: "국제캠퍼스 자대 열람실 ${widget.data['status']['data']['seatNumber']}",
+                            style: GoogleFonts.notoSans(
+                              fontWeight: FontWeight.normal,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    RichText(
+                      text: TextSpan(
+                        text: "입실 시간: ",
+                        style: GoogleFonts.notoSans(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                          fontSize: 16,
+                        ),
+                        children: [
+                          TextSpan(
+                            text: fromMillis(widget.data['status']['data']['reservedTime']),
+                            style: GoogleFonts.notoSans(
+                              fontWeight: FontWeight.normal,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    RichText(
+                      text: TextSpan(
+                        text: "퇴실 시간: ",
+                        style: GoogleFonts.notoSans(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                          fontSize: 16,
+                        ),
+                        children: [
+                          TextSpan(
+                            text: fromMillis(widget.data['status']['data']['reservedTime'] + widget.data['status']['data']['time'] * 60 * 1000),
+                            style: GoogleFonts.notoSans(
+                              fontWeight: FontWeight.normal,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    RichText(
+                      text: TextSpan(
+                        text: "좌석 연장: ",
+                        style: GoogleFonts.notoSans(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                          fontSize: 16,
+                        ),
+                        children: [
+                          TextSpan(
+                            text: "${widget.data['status']['addCount']}회 연장(${3 - widget.data['status']['addCount']}회 가능)",
+                            style: GoogleFonts.notoSans(
+                              fontWeight: FontWeight.normal,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    RichText(
+                      text: TextSpan(
+                        text: "입실 처리: ",
+                        style: GoogleFonts.notoSans(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                          fontSize: 16,
+                        ),
+                        children: [
+                          TextSpan(
+                            text: "승인",
+                            style: GoogleFonts.notoSans(
+                              fontWeight: FontWeight.normal,
+                              color: khblue,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        ElevatedButton(
+                          onPressed: () async {
+                            await http.post(
+                                Uri.parse('http://localhost:8080/user/seat/exit'),
+                                headers: <String, String>{
+                                  'Content-Type': 'application/json'
+                                },
+                                body: jsonEncode(<String, dynamic>{
+                                  'id': widget.data['id'],
+                                  'session': widget.data['cookie'][0],
+                                  'code': widget.data['status']['data']['seatNumber'],
+                                })
+                            );
+
+                            await updateStatus(widget.data);
+
+                            setState(() {
+
+                            });
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: khred,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                          ),
+                          child: Text("퇴실"),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            widget.data['status']['data']['time'] += widget.data['status']['data']['time'] ~/ (widget.data['status']['addCount'] + 1);
+                            widget.data['status']['addCount']++;
+                            setState((){});
+                          },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: khblue,
                             foregroundColor: Colors.white,
@@ -355,7 +596,7 @@ class _MyPageState extends State<MyPage> {
                     ],
                   ),
                   child: FutureBuilder(future: getWatchSeats(widget.data), builder: (context, snapshot) {
-                      var ls = [];
+                      ls = [];
                       if (snapshot.hasData) {
                         ls = snapshot.data!;
                       }

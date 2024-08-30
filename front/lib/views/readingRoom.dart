@@ -9,18 +9,6 @@ import '../theme.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-Future<List<dynamic>> getSeats(int roomCode) async {
-  if (roomCode == 12) {
-    final res = await http.get(Uri.parse('http://localhost:8080/room/seats'));
-    final data = jsonDecode(res.body) as Map<String, dynamic>;
-    return data['data'] as List<dynamic>;
-  }
-
-  final res = await http.get(Uri.parse('https://libseat.khu.ac.kr/libraries/seats/$roomCode'));
-  final data = jsonDecode(res.body) as Map<String, dynamic>;
-  return data['data'] as List<dynamic>;
-}
-
 class ReadingRoom extends StatefulWidget {
   final Map<String, dynamic> data;
   final Map<String, dynamic> room;
@@ -124,6 +112,9 @@ class _ReadingRoomState extends State<ReadingRoom> {
         isMySeat = true;
       }
     }
+    if (widget.data['status']['ismy'] != null) {
+      isMySeat = widget.data['status']['data']['seatNumber'] == seat['code'];
+    }
 
     // for some correcting positions
     if (widget.room['code'] == 11) {
@@ -175,7 +166,7 @@ class _ReadingRoomState extends State<ReadingRoom> {
             reserveDialog(context, widget.data, seat, widget.room);
           }
           else {
-            alarmDialog(context, widget.data, seat, widget.room['name']);
+            alarmDialog(context, widget.data, seat, widget.room);
           }
         },
         child: Container(
@@ -347,11 +338,11 @@ void reserveDialog(BuildContext context, Map<String, dynamic> userData, Map<Stri
                               return;
                             }
 
-
                             await updateStatus(userData);
 
                             setState(() {});
 
+                            Navigator.of(context).pop();
                             Navigator.of(context).pop();
                             Navigator.of(context).pop();
                           },
@@ -481,7 +472,8 @@ void alarmDialog(BuildContext context, Map<String, dynamic> userData, Map<String
                               'session': userData['cookie'][0],
                               'seatNumber': seat['code'],
                               'seatName': seat['name'],
-                              'seatGroup': room,
+                              'seatGroup': room['name'],
+                              'groupCode': room['code']
                             })
                         );
 
