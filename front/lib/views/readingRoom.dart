@@ -146,10 +146,23 @@ class _ReadingRoomState extends State<ReadingRoom> {
 
     if (widget.room['code'] == 12) {
       // 자대 열람실
-      //xpos *= 0.9;
-      //width *= 0.9;
-      //ypos *= 0.85;
-      //height *= 0.85;
+      xpos *= 0.89;
+      width *= 1.9;
+      ypos *= 0.81;
+      height *= 1.65;
+      final int seatNo = int.parse(seat['name']);
+      if (seatNo >= 7 && seatNo <= 18) {
+        ypos += 3;
+        if (seatNo >=7 && seatNo <= 12) {
+          ypos += 3;
+        }
+      }
+      else if (seatNo >= 24 && seatNo <= 27) {
+        ypos += 1.5;
+      }
+      else if (seatNo == 47) {
+        ypos -= 1.5;
+      }
     }
 
     return Positioned(
@@ -298,8 +311,8 @@ void reserveDialog(BuildContext context, Map<String, dynamic> userData, Map<Stri
                           ),
                           onPressed: () async {
                             final res;
-                            /*if(room['code'] == 12){
-                                  res = await http.post(
+                            if(room['code'] == 12){
+                                  res = await http.put(
                                   Uri.parse('http://localhost:8080/user/reserve'),
                                   headers: <String, String>{
                                     'Content-Type': 'application/json'
@@ -311,8 +324,8 @@ void reserveDialog(BuildContext context, Map<String, dynamic> userData, Map<Stri
                                     'time': selectedHour * 60 + selectedMinute
                                   })
                               );
-                            } */
-                            //else{
+                            }
+                            else{
                                   res = await http.post(
                                   Uri.parse('http://localhost:8080/user/seat/use'),
                                   headers: <String, String>{
@@ -325,7 +338,7 @@ void reserveDialog(BuildContext context, Map<String, dynamic> userData, Map<Stri
                                     'time': selectedHour * 60 + selectedMinute
                                   })
                               );
-                            //}
+                            }
                             print(res.body);
                             final data = jsonDecode(res.body) as Map<String, dynamic>;
                             if (!data['ok']) {
