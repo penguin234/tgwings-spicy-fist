@@ -7,3 +7,6 @@ To prevent the end of the world, we decided to create a faster library app.
 
 
 Now, the fate of humanity rests in our hands…
+
+###api 명세서
+https://muddy-leech-f9a.notion.site/API-20537cdd96094d65b83e83eed77e6cfc
