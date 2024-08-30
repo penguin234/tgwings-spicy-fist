@@ -598,7 +598,27 @@ app.post('/seats/reserve/reserve/my', (req,res) => {             // my reserve r
         data: session2.map((code) => ({'code': code, 'name': seatToRoom[code].name, 'group': seatToRoom[code].group, 'groupCode': seatToRoom[code].groupCode}))
     })
 })
+app.put('/seats/reserve/forcedoff', (req, res) => {                //자리 예약, 예약 o -> 예약 x
+    const  seatNumber= req.body.seatNumber
 
+    let data = database.getSeatBySeatNumber(seatNumber)
+    if (data.length == 0) {                          //예약한 자리 없음
+        res.status(404).json({
+            ok: false,
+            err: 'No reservation found for the given seatNumber'
+        })
+        return
+    }
+
+    //예약된 좌석을 취소
+    database.deleteSeat(data)
+
+    res.json({
+        ok: true,
+        message: 'The seat was forced to leave.',
+        data: data //취소된 좌석 정보
+    })
+})
 // 열람실 좌석 정보
 app.get('/room/seats', (req, res) => {
     let data = [
